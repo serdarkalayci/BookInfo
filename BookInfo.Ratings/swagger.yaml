@@ -1,0 +1,138 @@
+basePath: /
+consumes:
+- application/json
+definitions:
+  GenericError:
+    description: GenericError is a generic error message returned by a server
+    properties:
+      message:
+        type: string
+        x-go-name: Message
+    type: object
+    x-go-package: bookinfo/ratings/handlers
+  NewRating:
+    description: NewRating defines the structure for an API Rating
+    properties:
+      bookid:
+        description: the id of the book
+        format: int64
+        minimum: 1
+        type: integer
+        x-go-name: BookID
+      rating:
+        description: the rating of the book
+        format: float
+        minimum: 0.01
+        type: number
+        x-go-name: Rating
+    required:
+    - rating
+    type: object
+    x-go-package: bookinfo/ratings/dto
+  Rating:
+    description: Rating defines the structure for an API Rating
+    properties:
+      bookid:
+        description: the id of the book
+        format: int64
+        minimum: 1
+        type: integer
+        x-go-name: BookID
+      rating:
+        description: the rating of the book
+        format: float
+        minimum: 0.01
+        type: number
+        x-go-name: CurrentRating
+      votecount:
+        description: the rating of the book
+        format: int32
+        minimum: 0.01
+        type: integer
+        x-go-name: VoteCount
+    required:
+    - rating
+    - votecount
+    type: object
+    x-go-package: bookinfo/ratings/data
+  ValidationError:
+    description: ValidationError is a collection of validation error messages
+    properties:
+      messages:
+        items:
+          type: string
+        type: array
+        x-go-name: Messages
+    type: object
+    x-go-package: bookinfo/ratings/handlers
+info:
+  description: Documentation for Ratings API
+  title: of Ratings API
+  version: 1.0.0
+paths:
+  /Ratings:
+    put:
+      description: Update a Ratings details
+      operationId: updateRating
+      parameters:
+      - description: |-
+          rating data structure to Update or Create.
+          Note: the id field is ignored by update and create operations
+        in: body
+        name: Body
+        required: true
+        schema:
+          $ref: '#/definitions/NewRating'
+      - description: The id of the rating for which the operation relates
+        format: int64
+        in: path
+        name: id
+        required: true
+        type: integer
+        x-go-name: ID
+      responses:
+        "201":
+          $ref: '#/responses/noContentResponse'
+        "404":
+          $ref: '#/responses/errorResponse'
+        "422":
+          $ref: '#/responses/errorValidation'
+      tags:
+      - Ratings
+  /Ratings/{id}:
+    get:
+      description: Return a list of Ratings from the database
+      operationId: listSingleRating
+      responses:
+        "200":
+          $ref: '#/responses/RatingResponse'
+        "404":
+          $ref: '#/responses/errorResponse'
+      tags:
+      - Ratings
+produces:
+- application/json
+responses:
+  RatingResponse:
+    description: Data structure representing a single rating
+    schema:
+      $ref: '#/definitions/Rating'
+  RatingsResponse:
+    description: A list of ratings
+    schema:
+      items:
+        $ref: '#/definitions/Rating'
+      type: array
+  errorResponse:
+    description: Generic error message returned as a string
+    schema:
+      $ref: '#/definitions/GenericError'
+  errorValidation:
+    description: Validation errors defined as an array of strings
+    schema:
+      $ref: '#/definitions/ValidationError'
+  noContentResponse:
+    description: No content is returned by this API endpoint
+schemes:
+- http
+swagger: "2.0"
