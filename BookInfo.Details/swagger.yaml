@@ -15,6 +15,12 @@ definitions:
         minimum: 1
         type: integer
         x-go-name: BookID
+      currentstock:
+        description: the number of books in the stock
+        format: int64
+        minimum: 0
+        type: integer
+        x-go-name: CurrentStock
       isbn:
         description: the ISBN of the book
         type: string

@@ -17,6 +17,8 @@ namespace BookInfo.ProductPage.Dto
         public DateTime PublishDate { get; set; }
         [JsonPropertyName("price")]
         public decimal Price { get; set; }
+        [JsonPropertyName("currentstock")]
+        public decimal CurrentStock { get; set; }
 
     }
 }
