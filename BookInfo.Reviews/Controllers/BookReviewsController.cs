@@ -14,11 +14,6 @@ namespace BookInfo.Reviews.Controllers
     [Route("[controller]")]
     public class BookReviewController : ControllerBase
     {
-        private static readonly string[] Summaries = new[]
-        {
-            "Freezing", "Bracing", "Chilly", "Cool", "Mild", "Warm", "Balmy", "Hot", "Sweltering", "Scorching"
-        };
-
         private readonly ILogger<BookReviewController> _logger;
 
         public BookReviewController(ILogger<BookReviewController> logger)
