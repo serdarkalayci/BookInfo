@@ -8,6 +8,8 @@ import (
 
 	"bookinfo/details/data"
 	"bookinfo/details/dto"
+
+	opentracing "github.com/opentracing/opentracing-go"
 )
 
 // swagger:route GET /Ratings/{id} Ratings listSingleRating
@@ -18,6 +20,9 @@ import (
 
 // ListSingle handles GET requests
 func (p *APIContext) ListSingle(rw http.ResponseWriter, r *http.Request) {
+	tracer := opentracing.GlobalTracer()
+	span := tracer.StartSpan("list-single-detail")
+
 	id := getBookID(r)
 
 	p.l.Println("[DEBUG] get record id", id)
@@ -46,4 +51,5 @@ func (p *APIContext) ListSingle(rw http.ResponseWriter, r *http.Request) {
 		// we should never be here but log the error just incase
 		p.l.Println("[ERROR] serializing Rating", err)
 	}
+	span.Finish()
 }
