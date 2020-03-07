@@ -1,0 +1,7 @@
+BookInfo.Details/details
+BookInfo.Ratings/ratings
+**/obj
+
+.DS_Store
+BookInfo.FrontEnd/obj/Debug/netcoreapp3.1/HelloServerless.WebApp.assets.cache
+BookInfo.ProductPage/obj/Debug/netcoreapp3.1/BookInfo.ProductPage.assets.cache

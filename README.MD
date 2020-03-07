@@ -1,1 +1,1 @@
-Demo application written in C# to run on serverless platform on RedHat OpenShift
+Kiali's demo application rewritten in C# and Golang

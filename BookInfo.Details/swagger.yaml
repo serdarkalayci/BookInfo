@@ -1,0 +1,137 @@
+basePath: /
+consumes:
+- application/json
+definitions:
+  Detail:
+    description: Detail defines the structure for an Book detail
+    properties:
+      author:
+        description: the author of the book
+        type: string
+        x-go-name: Author
+      bookid:
+        description: the id of the book
+        format: int64
+        minimum: 1
+        type: integer
+        x-go-name: BookID
+      isbn:
+        description: the ISBN of the book
+        type: string
+        x-go-name: ISBN
+      name:
+        description: the name of the book
+        type: string
+        x-go-name: Name
+      price:
+        description: the price of the book
+        format: float
+        minimum: 0.01
+        type: number
+        x-go-name: Price
+      publishdate:
+        description: the publish date of the book
+        format: date-time
+        type: string
+        x-go-name: PublishDate
+    required:
+    - name
+    - isbn
+    - author
+    - publishdate
+    - price
+    type: object
+    x-go-package: bookinfo/details/data
+  DetailPrice:
+    description: DetailPrice defines the structure for an Book to update just the
+      price
+    properties:
+      bookid:
+        description: the id of the book
+        format: int64
+        minimum: 1
+        type: integer
+        x-go-name: BookID
+      price:
+        description: the price of the book
+        format: float
+        minimum: 0.01
+        type: number
+        x-go-name: Price
+    required:
+    - price
+    type: object
+    x-go-package: bookinfo/details/dto
+  GenericError:
+    description: GenericError is a generic error message returned by a server
+    properties:
+      message:
+        type: string
+        x-go-name: Message
+    type: object
+    x-go-package: bookinfo/details/handlers
+  ValidationError:
+    description: ValidationError is a collection of validation error messages
+    properties:
+      messages:
+        items:
+          type: string
+        type: array
+        x-go-name: Messages
+    type: object
+    x-go-package: bookinfo/details/handlers
+info:
+  description: Documentation for Details API
+  title: of Details API
+  version: 1.0.0
+paths:
+  /Ratings:
+    put:
+      description: Update a Ratings details
+      operationId: updateRating
+      responses:
+        "201":
+          $ref: '#/responses/noContentResponse'
+        "404":
+          $ref: '#/responses/errorResponse'
+        "422":
+          $ref: '#/responses/errorValidation'
+      tags:
+      - Ratings
+  /Ratings/{id}:
+    get:
+      description: Return a list of Ratings from the database
+      operationId: listSingleRating
+      responses:
+        "200":
+          $ref: '#/responses/RatingResponse'
+        "404":
+          $ref: '#/responses/errorResponse'
+      tags:
+      - Ratings
+produces:
+- application/json
+responses:
+  RatingResponse:
+    description: Data structure representing a single rating
+    schema:
+      $ref: '#/definitions/Detail'
+  RatingsResponse:
+    description: A list of ratings
+    schema:
+      items:
+        $ref: '#/definitions/Detail'
+      type: array
+  errorResponse:
+    description: Generic error message returned as a string
+    schema:
+      $ref: '#/definitions/GenericError'
+  errorValidation:
+    description: Validation errors defined as an array of strings
+    schema:
+      $ref: '#/definitions/ValidationError'
+  noContentResponse:
+    description: No content is returned by this API endpoint
+schemes:
+- http
+swagger: "2.0"

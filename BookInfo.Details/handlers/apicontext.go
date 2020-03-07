@@ -1,7 +1,7 @@
 package handlers
 
 import (
-	"bookinfo/ratings/dto"
+	"bookinfo/details/dto"
 	"fmt"
 	"log"
 	"net/http"
@@ -10,8 +10,8 @@ import (
 	"github.com/gorilla/mux"
 )
 
-// KeyRating is a key used for the Rating object in the context
-type KeyRating struct{}
+// KeyDetail is a key used for the Rating object in the context
+type KeyDetail struct{}
 
 // APIContext handler for getting and updating Ratings
 type APIContext struct {
@@ -37,7 +37,7 @@ type ValidationError struct {
 	Messages []string `json:"messages"`
 }
 
-// getRatingID returns the Rating ID from the URL
+// getBookID returns the BookID from the URL
 // Panics if cannot convert the id into an integer
 // this should never happen as the router ensures that
 // this is a valid number

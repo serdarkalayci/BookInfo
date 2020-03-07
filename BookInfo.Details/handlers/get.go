@@ -3,7 +3,7 @@ package handlers
 import (
 	"net/http"
 
-	"bookinfo/ratings/data"
+	"bookinfo/details/data"
 )
 
 // swagger:route GET /Ratings/{id} Ratings listSingleRating
@@ -18,9 +18,15 @@ func (p *APIContext) ListSingle(rw http.ResponseWriter, r *http.Request) {
 
 	p.l.Println("[DEBUG] get record id", id)
 
-	prod := data.GetRatingByID(id)
+	detail, err := data.GetDetailByID(id)
+	if err != nil {
+		p.l.Println("[ERROR] fetching book detail", err)
 
-	err := data.ToJSON(prod, rw)
+		rw.WriteHeader(http.StatusNotFound)
+		data.ToJSON(&GenericError{Message: err.Error()}, rw)
+		return
+	}
+	err = data.ToJSON(detail, rw)
 	if err != nil {
 		// we should never be here but log the error just incase
 		p.l.Println("[ERROR] serializing Rating", err)
