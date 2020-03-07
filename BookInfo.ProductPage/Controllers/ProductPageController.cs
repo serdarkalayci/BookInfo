@@ -33,8 +33,14 @@ namespace BookInfo.ProductPage.Controllers
         [Route("{bookId:int}")]
         public async Task<IActionResult> GetSingle(int bookId)
         {
-            Dto.BookReviewResult result = await GetReview(bookId);
-            return Ok(result);
+            Dto.BookReviewResult revresult = await GetReview(bookId);
+            Dto.BookDetailResult detresult = await GetDetail(bookId);
+            Dto.ProductPageResponse response = new Dto.ProductPageResponse() {
+                bookDetailResult = detresult,
+                bookReviewResult = revresult
+                
+            };
+            return Ok(response);
             //return Ok(Data.BookReviews.Reviews.Where(c => c.BookId == bookId));
         }
 
@@ -48,6 +54,19 @@ namespace BookInfo.ProductPage.Controllers
             serviceURL += "/bookreview/" + bookId;
             var streamTask = client.GetStreamAsync(serviceURL);
             var result = await JsonSerializer.DeserializeAsync<Dto.BookReviewResult>(await streamTask);
+            return result;       
+        }
+
+        private async Task<Dto.BookDetailResult> GetDetail(int bookId) 
+        {
+            HttpClient client = new HttpClient();
+            client.DefaultRequestHeaders.Accept.Clear();
+            client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
+            client.DefaultRequestHeaders.Add("User-Agent", ".NET Foundation Product Page Service");
+            string serviceURL = System.Environment.GetEnvironmentVariable("REVIEW_URL") ?? "http://localhost:5113";
+            serviceURL += "/details/" + bookId;
+            var streamTask = client.GetStreamAsync(serviceURL);
+            var result = await JsonSerializer.DeserializeAsync<Dto.BookDetailResult>(await streamTask);
             return result;       
         }
     }
