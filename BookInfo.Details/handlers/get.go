@@ -10,6 +10,7 @@ import (
 	"bookinfo/details/dto"
 
 	opentracing "github.com/opentracing/opentracing-go"
+	"github.com/opentracing/opentracing-go/ext"
 )
 
 // swagger:route GET /Ratings/{id} Ratings listSingleRating
@@ -36,8 +37,19 @@ func (p *APIContext) ListSingle(rw http.ResponseWriter, r *http.Request) {
 		return
 	}
 	// Call stocks service
+	url := "http://localhost:5114/stocks/1"
+	// First prepare the tracing info
+	// Set some tags on the clientSpan to annotate that it's the client span. The additional HTTP tags are useful for debugging purposes.
+	ext.SpanKindRPCClient.Set(span)
+	ext.HTTPUrl.Set(span, url)
+	ext.HTTPMethod.Set(span, "GET")
+
 	netClient := &http.Client{Timeout: time.Second * 10}
-	stockresponse, err := netClient.Get("http://localhost:5114/stocks/1")
+	req, _ := http.NewRequest("GET", url, nil)
+	// Inject the client span context into the headers
+	tracer.Inject(span.Context(), opentracing.HTTPHeaders, opentracing.HTTPHeadersCarrier(req.Header))
+	stockresponse, err := netClient.Do(req)
+
 	stockInfo := &dto.StockInfo{
 		CurrentStock: 0,
 	}
