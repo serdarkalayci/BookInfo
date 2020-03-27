@@ -43,13 +43,25 @@ namespace BookInfo.Reviews
             {
                 string serviceName = serviceProvider.GetRequiredService<Microsoft.AspNetCore.Hosting.IWebHostEnvironment>().ApplicationName;
 
-                // This will log to a default localhost installation of Jaeger.
-                var tracer = new Tracer.Builder(serviceName)
-                    .WithSampler(new ConstSampler(true))
-                    .Build();
+                if (System.Environment.GetEnvironmentVariable("JAEGER_SERVICE_NAME") == null) 
+                    Environment.SetEnvironmentVariable("JAEGER_SERVICE_NAME", serviceName);
+                if (System.Environment.GetEnvironmentVariable("JAEGER_AGENT_HOST") == null) 
+                    Environment.SetEnvironmentVariable("JAEGER_AGENT_HOST", "localhost");                
+                if (System.Environment.GetEnvironmentVariable("JAEGER_AGENT_PORT") == null) 
+                    Environment.SetEnvironmentVariable("JAEGER_AGENT_PORT", "6831");                
+                if (System.Environment.GetEnvironmentVariable("JAEGER_SAMPLER_TYPE") == null) 
+                    Environment.SetEnvironmentVariable("JAEGER_SAMPLER_TYPE", "const");
 
-                // Allows code that can't use DI to also access the tracer.
-                GlobalTracer.Register(tracer);
+                var loggerFactory = new LoggerFactory();
+
+                var config = Jaeger.Configuration.FromEnv(loggerFactory);
+                var tracer = config.GetTracer();
+
+                if (!GlobalTracer.IsRegistered())
+                {
+                    // Allows code that can't use DI to also access the tracer.
+                    GlobalTracer.Register(tracer);
+                }
 
                 return tracer;
             });            

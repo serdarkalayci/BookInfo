@@ -12,11 +12,11 @@ namespace BookInfo.Reviews.Controllers
 {
     [ApiController]
     [Route("[controller]")]
-    public class BookReviewController : ControllerBase
+    public class ReviewsController : ControllerBase
     {
-        private readonly ILogger<BookReviewController> _logger;
+        private readonly ILogger<ReviewsController> _logger;
 
-        public BookReviewController(ILogger<BookReviewController> logger)
+        public ReviewsController(ILogger<ReviewsController> logger)
         {
             _logger = logger;
         }

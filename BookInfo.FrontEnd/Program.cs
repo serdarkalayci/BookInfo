@@ -20,7 +20,7 @@ namespace HelloServerless.WebApp
             Host.CreateDefaultBuilder(args)
                 .ConfigureWebHostDefaults(webBuilder =>
                 {
-                    webBuilder.UseStartup<Startup>();
+                    webBuilder.UseStartup<Startup>().UseUrls(Environment.GetEnvironmentVariable("BASE_URL") ?? "http://*:5000");
                 });
     }
 }

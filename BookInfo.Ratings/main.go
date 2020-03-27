@@ -25,20 +25,23 @@ import (
 	jaegerlog "github.com/uber/jaeger-client-go/log"
 )
 
-var bindAddress = env.String("BIND_ADDRESS", false, ":5112", "Bind address for the server")
+var bindAddress = env.String("BASE_URL", false, ":5112", "Bind address for the server")
 
 func main() {
 	// Sample configuration for testing. Use constant sampling to sample every trace
 	// and enable LogSpan to log every span via configured Logger.
-	cfg := jaegercfg.Configuration{
-		ServiceName: "BookInfo.Ratings",
-		Sampler: &jaegercfg.SamplerConfig{
-			Type:  jaeger.SamplerTypeConst,
-			Param: 1,
-		},
-		Reporter: &jaegercfg.ReporterConfig{
-			LogSpans: true,
-		},
+	cfg, err := jaegercfg.FromEnv()
+	if err != nil {
+		cfg = &jaegercfg.Configuration{
+			ServiceName: "BookInfo.Details",
+			Sampler: &jaegercfg.SamplerConfig{
+				Type:  jaeger.SamplerTypeConst,
+				Param: 1,
+			},
+			Reporter: &jaegercfg.ReporterConfig{
+				LogSpans: true,
+			},
+		}
 	}
 
 	// Example logger and metrics factory. Use github.com/uber/jaeger-client-go/log

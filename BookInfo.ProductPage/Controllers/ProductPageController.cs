@@ -51,7 +51,7 @@ namespace BookInfo.ProductPage.Controllers
             client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
             client.DefaultRequestHeaders.Add("User-Agent", ".NET Foundation Product Page Service");
             string serviceURL = System.Environment.GetEnvironmentVariable("REVIEW_URL") ?? "http://localhost:5111";
-            serviceURL += "/bookreview/" + bookId;
+            serviceURL += "/reviews/" + bookId;
             var streamTask = client.GetStreamAsync(serviceURL);
             var result = await JsonSerializer.DeserializeAsync<Dto.BookReviewResult>(await streamTask);
             return result;       
@@ -63,7 +63,7 @@ namespace BookInfo.ProductPage.Controllers
             client.DefaultRequestHeaders.Accept.Clear();
             client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
             client.DefaultRequestHeaders.Add("User-Agent", ".NET Foundation Product Page Service");
-            string serviceURL = System.Environment.GetEnvironmentVariable("REVIEW_URL") ?? "http://localhost:5113";
+            string serviceURL = System.Environment.GetEnvironmentVariable("DETAIL_URL") ?? "http://localhost:5113";
             serviceURL += "/details/" + bookId;
             var streamTask = client.GetStreamAsync(serviceURL);
             var result = await JsonSerializer.DeserializeAsync<Dto.BookDetailResult>(await streamTask);
