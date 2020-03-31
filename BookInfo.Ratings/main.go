@@ -65,13 +65,14 @@ func main() {
 
 	// create the handlers
 	apiContext := handlers.NewAPIContext(l, v)
+	dbContext := handlers.NewDBContext(l, v)
 
 	// create a new serve mux and register the handlers
 	sm := mux.NewRouter()
 
 	// handlers for API
 	getR := sm.Methods(http.MethodGet).Subrouter()
-	getR.HandleFunc("/ratings/{id:[0-9]+}", apiContext.ListSingle)
+	getR.HandleFunc("/ratings/{id:[0-9]+}", dbContext.ListSingle)
 
 	putR := sm.Methods(http.MethodPut).Subrouter()
 	putR.HandleFunc("/ratings", apiContext.Update)

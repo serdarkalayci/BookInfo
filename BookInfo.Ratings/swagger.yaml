@@ -70,6 +70,13 @@ info:
   title: of Ratings API
   version: 1.0.0
 paths:
+  /:
+    get:
+      description: Returns OK if there's no problem
+      operationId: index
+      responses:
+        "200":
+          $ref: '#/responses/RatingResponse'
   /Ratings:
     put:
       description: Update a Ratings details

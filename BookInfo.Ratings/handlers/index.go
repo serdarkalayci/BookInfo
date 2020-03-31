@@ -3,22 +3,19 @@ package handlers
 import (
 	"net/http"
 
-	"bookinfo/ratings/data"
-
 	opentracing "github.com/opentracing/opentracing-go"
 	"github.com/opentracing/opentracing-go/ext"
 )
 
-// swagger:route GET /Ratings/{id} Ratings listSingleRating
-// Return a list of Ratings from the database
+// swagger:route GET / index
+// Returns OK if there's no problem
 // responses:
 //	200: RatingResponse
-//	404: errorResponse
 
-// ListSingle handles GET requests
-func (ctx *DBContext) ListSingle(rw http.ResponseWriter, r *http.Request) {
+// Index returns OK handles GET requests
+func (p *APIContext) Index(rw http.ResponseWriter, r *http.Request) {
 	tracer := opentracing.GlobalTracer()
-	spanname := "Ratings.ListSingle"
+	spanname := "Ratings.Index"
 	var span opentracing.Span
 
 	wireContext, err := opentracing.GlobalTracer().Extract(
@@ -26,7 +23,6 @@ func (ctx *DBContext) ListSingle(rw http.ResponseWriter, r *http.Request) {
 		opentracing.HTTPHeadersCarrier(r.Header))
 	if err != nil {
 		// The method is called without a span context in the http header.
-		//
 		span = tracer.StartSpan(spanname)
 	} else {
 		// Create the span referring to the RPC client if available.
@@ -38,15 +34,5 @@ func (ctx *DBContext) ListSingle(rw http.ResponseWriter, r *http.Request) {
 	ext.HTTPMethod.Set(span, r.Method)
 	defer span.Finish()
 
-	id := getBookID(r)
-
-	ctx.l.Println("[DEBUG] get record id", id)
-
-	rating, err := data.GetRatingByID(id, ctx.MongoClient, ctx.DatabaseName)
-
-	err = data.ToJSON(rating, rw)
-	if err != nil {
-		// we should never be here but log the error just incase
-		ctx.l.Println("[ERROR] serializing Rating", err)
-	}
+	rw.WriteHeader(200)
 }

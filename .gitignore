@@ -1,6 +1,10 @@
 BookInfo.Details/details
+BookInfo.Details/details.exe
 BookInfo.Ratings/ratings
+BookInfo.Ratings/ratings.exe
 **/obj/**
 **/bin/**
 
 **/.DS_Store
+**/mongo-persistence
+**/redis-persistence
