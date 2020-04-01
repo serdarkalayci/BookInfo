@@ -2,9 +2,9 @@ package handlers
 
 import (
 	"bookinfo/ratings/dto"
+	"bookinfo/ratings/logger"
 	"context"
 	"fmt"
-	"log"
 	"net/http"
 	"os"
 	"strconv"
@@ -20,7 +20,6 @@ type KeyRating struct{}
 
 // APIContext is the struct that has a logger and validation instance. It's the base for all handler functions
 type APIContext struct {
-	l *log.Logger
 	v *dto.Validation
 }
 
@@ -32,44 +31,43 @@ type DBContext struct {
 }
 
 // NewAPIContext returns a new APIContext handler with the given logger
-func NewAPIContext(l *log.Logger, v *dto.Validation) *APIContext {
-	return &APIContext{l, v}
+func NewAPIContext(v *dto.Validation) *APIContext {
+	return &APIContext{v}
 }
 
 // NewDBContext returns a new DBContext handler with the given logger
-func NewDBContext(l *log.Logger, v *dto.Validation) *DBContext {
+func NewDBContext(v *dto.Validation) *DBContext {
 	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
 	defer cancel()
 	// We try to get connectionstring value from the environment variables, if not found it falls back to local database
 	connectionString := os.Getenv("ConnectionString")
 	if connectionString == "" {
-		connectionString = "mongodb://root:example@localhost:27017"
-		l.Printf("ConnectionString from Env not found, falling back to local DB")
+		connectionString = "mongodb://root:example@mongo:27017"
+		logger.Log("ConnectionString from Env not found, falling back to local DB", logger.DebugLevel)
 	} else {
-		l.Printf("ConnectionString from Env is used: '%s'", connectionString)
+		logger.Log(fmt.Sprintf("ConnectionString from Env is used: '%s'", connectionString), logger.DebugLevel)
 	}
 	databaseName := os.Getenv("DatabaseName")
 	if databaseName == "" {
-		databaseName = "cookiemonster"
-		l.Printf("DatabaseName from Env not found, falling back to default")
+		databaseName = "ratingDB"
+		logger.Log("DatabaseName from Env not found, falling back to default", logger.DebugLevel)
 	} else {
-		l.Printf("DatabaseName from Env is used: '%s'", databaseName)
+		logger.Log(fmt.Sprintf("DatabaseName from Env is used: '%s'", databaseName), logger.DebugLevel)
 	}
 	client, err := mongo.NewClient(options.Client().ApplyURI(connectionString))
 	err = client.Connect(ctx)
 	if err != nil {
-		log.Fatal(err)
+		logger.Log("An error occured while connecting to tha database", logger.ErrorLevel, err)
 	}
 
 	// Check the connection
 	err = client.Ping(context.TODO(), nil)
 
 	if err != nil {
-		log.Fatal(err)
+		logger.Log("An error occured while connecting to tha database", logger.ErrorLevel, err)
 	}
-
-	l.Printf("Connected to MongoDB!")
-	return &DBContext{*client, databaseName, APIContext{l, v}}
+	logger.Log("Connected to MongoDB!", logger.DebugLevel)
+	return &DBContext{*client, databaseName, APIContext{v}}
 }
 
 // ErrInvalidRatingPath is an error message when the Rating path is not valid

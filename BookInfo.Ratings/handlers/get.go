@@ -1,9 +1,11 @@
 package handlers
 
 import (
+	"fmt"
 	"net/http"
 
 	"bookinfo/ratings/data"
+	"bookinfo/ratings/logger"
 
 	opentracing "github.com/opentracing/opentracing-go"
 	"github.com/opentracing/opentracing-go/ext"
@@ -40,13 +42,13 @@ func (ctx *DBContext) ListSingle(rw http.ResponseWriter, r *http.Request) {
 
 	id := getBookID(r)
 
-	ctx.l.Println("[DEBUG] get record id", id)
+	logger.Log(fmt.Sprintf("get record id %s", id), logger.DebugLevel)
 
 	rating, err := data.GetRatingByID(id, ctx.MongoClient, ctx.DatabaseName)
 
 	err = data.ToJSON(rating, rw)
 	if err != nil {
 		// we should never be here but log the error just incase
-		ctx.l.Println("[ERROR] serializing Rating", err)
+		logger.Log("Error serializing Rating", logger.ErrorLevel, err)
 	}
 }

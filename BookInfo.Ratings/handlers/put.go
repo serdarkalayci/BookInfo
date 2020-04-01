@@ -1,10 +1,12 @@
 package handlers
 
 import (
+	"fmt"
 	"net/http"
 
 	"bookinfo/ratings/data"
 	"bookinfo/ratings/dto"
+	"bookinfo/ratings/logger"
 )
 
 // swagger:route PUT /Ratings Ratings updateRating
@@ -20,7 +22,7 @@ func (p *APIContext) Update(rw http.ResponseWriter, r *http.Request) {
 
 	// fetch the Rating from the context
 	rating := r.Context().Value(KeyRating{}).(dto.NewRating)
-	p.l.Println("[DEBUG] updating record id", rating.BookID)
+	logger.Log(fmt.Sprintf("updating record id", rating.BookID), logger.DebugLevel)
 
 	data.UpdateRating(rating)
 	// write the no content success header

@@ -84,7 +84,7 @@ services:
       MONGO_INITDB_ROOT_USERNAME: root
       MONGO_INITDB_ROOT_PASSWORD: example
     volumes:
-    - ./mongo-persistence:/data/db
+    - bookinfo-mongodata:/data/db
     environment:
       MONGO_INITDB_DATABASE: ratingDB    
   mongo-express:
@@ -96,3 +96,5 @@ services:
     environment:
       ME_CONFIG_MONGODB_ADMINUSERNAME: root
       ME_CONFIG_MONGODB_ADMINPASSWORD: example
+volumes: 
+  bookinfo-mongodata:

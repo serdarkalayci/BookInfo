@@ -13,6 +13,7 @@ import (
 
 	"bookinfo/ratings/dto"
 	"bookinfo/ratings/handlers"
+	"bookinfo/ratings/logger"
 
 	"github.com/gorilla/mux"
 	"github.com/nicholasjackson/env"
@@ -31,7 +32,7 @@ func main() {
 	// Sample configuration for testing. Use constant sampling to sample every trace
 	// and enable LogSpan to log every span via configured Logger.
 	cfg, err := jaegercfg.FromEnv()
-	if err != nil {
+	if err != nil || cfg.ServiceName == "" {
 		cfg = &jaegercfg.Configuration{
 			ServiceName: "BookInfo.Details",
 			Sampler: &jaegercfg.SamplerConfig{
@@ -60,12 +61,11 @@ func main() {
 	defer closer.Close()
 	env.Parse()
 
-	l := log.New(os.Stdout, "ratings-api ", log.LstdFlags)
 	v := dto.NewValidation()
 
 	// create the handlers
-	apiContext := handlers.NewAPIContext(l, v)
-	dbContext := handlers.NewDBContext(l, v)
+	apiContext := handlers.NewAPIContext(v)
+	dbContext := handlers.NewDBContext(v)
 
 	// create a new serve mux and register the handlers
 	sm := mux.NewRouter()
@@ -89,7 +89,6 @@ func main() {
 	s := http.Server{
 		Addr:         *bindAddress,      // configure the bind address
 		Handler:      sm,                // set the default handler
-		ErrorLog:     l,                 // set the logger for the server
 		ReadTimeout:  5 * time.Second,   // max time to read request from the client
 		WriteTimeout: 10 * time.Second,  // max time to write response to the client
 		IdleTimeout:  120 * time.Second, // max time for connections using TCP Keep-Alive
@@ -97,11 +96,11 @@ func main() {
 
 	// start the server
 	go func() {
-		l.Println(fmt.Sprintf("Starting server on %s", *bindAddress))
+		logger.Log(fmt.Sprintf("Starting server on %s", *bindAddress), logger.DebugLevel)
 
 		err := s.ListenAndServe()
 		if err != nil {
-			l.Printf("Error starting server: %s\n", err)
+			logger.Log("Error starting server", logger.ErrorLevel, err)
 			os.Exit(1)
 		}
 	}()

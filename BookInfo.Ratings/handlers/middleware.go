@@ -6,6 +6,7 @@ import (
 
 	"bookinfo/ratings/data"
 	"bookinfo/ratings/dto"
+	"bookinfo/ratings/logger"
 )
 
 // MiddlewareValidateProduct validates the product in the request and calls next if ok
@@ -15,7 +16,7 @@ func (apiContext *APIContext) MiddlewareValidateNewRating(next http.Handler) htt
 
 		err := data.FromJSON(rating, r.Body)
 		if err != nil {
-			apiContext.l.Println("[ERROR] deserializing rating", err)
+			logger.Log("deserializing rating", logger.ErrorLevel, err)
 
 			rw.WriteHeader(http.StatusBadRequest)
 			data.ToJSON(&GenericError{Message: err.Error()}, rw)
@@ -25,7 +26,7 @@ func (apiContext *APIContext) MiddlewareValidateNewRating(next http.Handler) htt
 		// validate the product
 		errs := apiContext.v.Validate(rating)
 		if len(errs) != 0 {
-			apiContext.l.Println("[ERROR] validating product", errs)
+			logger.Log("[ERROR] validating product", logger.ErrorLevel, errs[0])
 
 			// return the validation messages as an array
 			rw.WriteHeader(http.StatusUnprocessableEntity)
