@@ -22,6 +22,8 @@ services:
       JAEGER_AGENT_HOST : "jaeger"
       JAEGER_AGENT_PORT : 6831
       JAEGER_SERVICE_NAME: bookinfo-ratings
+      ConnectionString: "mongodb://host.docker.internal:27017"
+      DatabaseName: ratingDB
   details:
     build: ../BookInfo.Details/.
     container_name: bookinfo_details
@@ -65,36 +67,3 @@ services:
       - "16686:16686"
       - "14268:14268"
       - "9411:9411"
-  redis:
-    image: bitnami/redis:latest
-    container_name: bookinfo-redis
-    ports:
-      - "6379:6379"
-    volumes:
-      - /redis-persistence:/bitnami/redis/data
-    environment:
-      - ALLOW_EMPTY_PASSWORD=yes
-  mongo:
-    image: bookinfo-mongo
-    container_name: bookinfo-mongo
-    restart: always
-    ports:
-      - 27017:27017
-    environment:
-      MONGO_INITDB_ROOT_USERNAME: root
-      MONGO_INITDB_ROOT_PASSWORD: example
-    volumes:
-    - bookinfo-mongodata:/data/db
-    environment:
-      MONGO_INITDB_DATABASE: ratingDB    
-  mongo-express:
-    image: mongo-express
-    container_name: bookinfo-mexpress
-    restart: always
-    ports:
-      - 8081:8081
-    environment:
-      ME_CONFIG_MONGODB_ADMINUSERNAME: root
-      ME_CONFIG_MONGODB_ADMINPASSWORD: example
-volumes: 
-  bookinfo-mongodata:

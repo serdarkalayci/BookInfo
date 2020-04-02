@@ -73,10 +73,7 @@ func main() {
 	// handlers for API
 	getR := sm.Methods(http.MethodGet).Subrouter()
 	getR.HandleFunc("/ratings/{id:[0-9]+}", dbContext.ListSingle)
-
-	putR := sm.Methods(http.MethodPut).Subrouter()
-	putR.HandleFunc("/ratings", apiContext.Update)
-	putR.Use(apiContext.MiddlewareValidateNewRating)
+	getR.HandleFunc("/", apiContext.Index)
 
 	// handler for documentation
 	opts := middleware.RedocOpts{SpecURL: "/swagger.yaml"}

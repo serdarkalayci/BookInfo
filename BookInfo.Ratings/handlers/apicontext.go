@@ -5,6 +5,7 @@ import (
 	"bookinfo/ratings/logger"
 	"context"
 	"fmt"
+	"log"
 	"net/http"
 	"os"
 	"strconv"
@@ -42,7 +43,7 @@ func NewDBContext(v *dto.Validation) *DBContext {
 	// We try to get connectionstring value from the environment variables, if not found it falls back to local database
 	connectionString := os.Getenv("ConnectionString")
 	if connectionString == "" {
-		connectionString = "mongodb://root:example@mongo:27017"
+		connectionString = "mongodb://localhost:27017"
 		logger.Log("ConnectionString from Env not found, falling back to local DB", logger.DebugLevel)
 	} else {
 		logger.Log(fmt.Sprintf("ConnectionString from Env is used: '%s'", connectionString), logger.DebugLevel)
@@ -58,6 +59,7 @@ func NewDBContext(v *dto.Validation) *DBContext {
 	err = client.Connect(ctx)
 	if err != nil {
 		logger.Log("An error occured while connecting to tha database", logger.ErrorLevel, err)
+		log.Fatal("Cannot connect to database")
 	}
 
 	// Check the connection
@@ -65,6 +67,7 @@ func NewDBContext(v *dto.Validation) *DBContext {
 
 	if err != nil {
 		logger.Log("An error occured while connecting to tha database", logger.ErrorLevel, err)
+		log.Fatal("Cannot connect to database")
 	}
 	logger.Log("Connected to MongoDB!", logger.DebugLevel)
 	return &DBContext{*client, databaseName, APIContext{v}}

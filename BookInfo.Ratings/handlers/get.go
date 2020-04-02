@@ -42,7 +42,7 @@ func (ctx *DBContext) ListSingle(rw http.ResponseWriter, r *http.Request) {
 
 	id := getBookID(r)
 
-	logger.Log(fmt.Sprintf("get record id %s", id), logger.DebugLevel)
+	logger.Log(fmt.Sprintf("get record id %d", id), logger.DebugLevel)
 
 	rating, err := data.GetRatingByID(id, ctx.MongoClient, ctx.DatabaseName)
 
