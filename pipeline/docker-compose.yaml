@@ -1,4 +1,4 @@
-version: '3'
+version: '3.7'
 services:
   product-page:
     build: ../BookInfo.ProductPage/.
@@ -67,3 +67,12 @@ services:
       - "16686:16686"
       - "14268:14268"
       - "9411:9411"
+  prometheus:
+    build: prometheus/.
+    container_name: bookinfo_prometheus
+  grafana:
+    image: grafana/grafana
+    ports:
+      - 3000:3000
+    depends_on: 
+      - prometheus

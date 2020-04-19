@@ -8,3 +8,5 @@ BookInfo.Ratings/ratings.exe
 **/.DS_Store
 **/mongo-persistence
 **/redis-persistence
+
+.vscode

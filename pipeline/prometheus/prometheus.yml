@@ -1,0 +1,24 @@
+global:
+  scrape_interval:     15s # Set the scrape interval to every 15 seconds. Default is every 1 minute.
+  evaluation_interval: 15s # Evaluate rules every 15 seconds. The default is every 1 minute.  
+scrape_configs:
+  - job_name: 'product_page'
+    # metrics_path defaults to '/metrics'
+    static_configs:
+    - targets: ['product-page:5100']
+  - job_name: 'details'
+    # metrics_path defaults to '/metrics'
+    static_configs:
+    - targets: ['details:5113']
+  - job_name: 'ratings'
+    # metrics_path defaults to '/metrics'
+    static_configs:
+    - targets: ['ratings:5112']
+  - job_name: 'reviews'
+    # metrics_path defaults to '/metrics'
+    static_configs:
+    - targets: ['reviews:5113']
+  - job_name: 'stocks'
+    # metrics_path defaults to '/metrics'
+    static_configs:
+    - targets: ['stocks:5114']
