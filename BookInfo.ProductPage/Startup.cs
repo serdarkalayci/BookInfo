@@ -15,6 +15,8 @@ using OpenTracing;
 using OpenTracing.Util;
 using Jaeger.Samplers;
 using Jaeger;
+using Prometheus;
+using Microsoft.AspNetCore.Http.Extensions;
 
 namespace BookInfo.ProductPage
 {
@@ -75,6 +77,9 @@ namespace BookInfo.ProductPage
                 app.UseDeveloperExceptionPage();
             }
 
+            //Standard http metrics for Prometheus
+            app.UseHttpMetrics();
+
             // Enable middleware to serve generated Swagger as a JSON endpoint.
             app.UseSwagger();
 
@@ -92,6 +97,7 @@ namespace BookInfo.ProductPage
             app.UseEndpoints(endpoints =>
             {
                 endpoints.MapControllers();
+                endpoints.MapMetrics();
             });
         }
     }
