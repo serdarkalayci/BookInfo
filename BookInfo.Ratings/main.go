@@ -9,21 +9,26 @@ import (
 	"os/signal"
 	"time"
 
-	"github.com/go-openapi/runtime/middleware"
+	openapimw "github.com/go-openapi/runtime/middleware"
 
 	"bookinfo/ratings/dto"
 	"bookinfo/ratings/handlers"
 	"bookinfo/ratings/logger"
+	"bookinfo/ratings/middleware"
 
 	"github.com/gorilla/mux"
 	"github.com/nicholasjackson/env"
 
 	opentracing "github.com/opentracing/opentracing-go"
-	"github.com/uber/jaeger-lib/metrics"
-
 	"github.com/uber/jaeger-client-go"
+
+	jprom "github.com/uber/jaeger-lib/metrics/prometheus"
+
 	jaegercfg "github.com/uber/jaeger-client-go/config"
 	jaegerlog "github.com/uber/jaeger-client-go/log"
+
+	"github.com/prometheus/client_golang/prometheus"
+	"github.com/prometheus/client_golang/prometheus/promhttp"
 )
 
 var bindAddress = env.String("BASE_URL", false, ":5112", "Bind address for the server")
@@ -49,7 +54,7 @@ func main() {
 	// and github.com/uber/jaeger-lib/metrics respectively to bind to real logging and metrics
 	// frameworks.
 	jLogger := jaegerlog.StdLogger
-	jMetricsFactory := metrics.NullFactory
+	jMetricsFactory := jprom.New()
 
 	// Initialize tracer with a logger and a metrics factory
 	tracer, closer, _ := cfg.NewTracer(
@@ -69,6 +74,7 @@ func main() {
 
 	// create a new serve mux and register the handlers
 	sm := mux.NewRouter()
+	sm.Use(middleware.MetricsMiddleware)
 
 	// handlers for API
 	getR := sm.Methods(http.MethodGet).Subrouter()
@@ -76,8 +82,8 @@ func main() {
 	getR.HandleFunc("/", apiContext.Index)
 
 	// handler for documentation
-	opts := middleware.RedocOpts{SpecURL: "/swagger.yaml"}
-	sh := middleware.Redoc(opts, nil)
+	opts := openapimw.RedocOpts{SpecURL: "/swagger.yaml"}
+	sh := openapimw.Redoc(opts, nil)
 
 	getR.Handle("/docs", sh)
 	getR.Handle("/swagger.yaml", http.FileServer(http.Dir("./")))
@@ -90,6 +96,10 @@ func main() {
 		WriteTimeout: 10 * time.Second,  // max time to write response to the client
 		IdleTimeout:  120 * time.Second, // max time for connections using TCP Keep-Alive
 	}
+
+	sm.PathPrefix("/metrics").Handler(promhttp.Handler())
+	prometheus.MustRegister(middleware.RequestCounterVec)
+	prometheus.MustRegister(middleware.RequestDurationGauge)
 
 	// start the server
 	go func() {

@@ -45,7 +45,12 @@ func (ctx *DBContext) ListSingle(rw http.ResponseWriter, r *http.Request) {
 	logger.Log(fmt.Sprintf("get record id %d", id), logger.DebugLevel)
 
 	rating, err := data.GetRatingByID(id, ctx.MongoClient, ctx.DatabaseName)
-
+	if err != nil {
+		// we should never be here but log the error just incase
+		logger.Log("Error getting Rating", logger.ErrorLevel, err)
+	} else {
+		logger.Log(fmt.Sprintf("Current Rating: %f", rating.CurrentRating), logger.DebugLevel)
+	}
 	err = data.ToJSON(rating, rw)
 	if err != nil {
 		// we should never be here but log the error just incase
