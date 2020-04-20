@@ -4,11 +4,11 @@ namespace BookInfo.Reviews.Dto
 
     public class BookReviewResult 
     {
-        [JsonPropertyName("bookid")]
+        [JsonPropertyName("bookId")]
         public int BookId { get; set; }
-        [JsonPropertyName("rating")]
+        [JsonPropertyName("currentRating")]
         public decimal Rating { get; set; }
-        [JsonPropertyName("votecount")]
+        [JsonPropertyName("voteCount")]
         public int VoteCount { get; set; }
         [JsonPropertyName("reviews")]
         public BookReview[] Reviews { get; set; }
