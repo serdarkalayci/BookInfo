@@ -6,6 +6,7 @@ import (
 
 	"bookinfo/details/data"
 	"bookinfo/details/dto"
+	"bookinfo/details/logger"
 )
 
 // MiddlewareValidateNewDetail validates new book detail in the request and calls next if ok
@@ -15,7 +16,7 @@ func (apiContext *APIContext) MiddlewareValidateNewDetail(next http.Handler) htt
 
 		err := data.FromJSON(detail, r.Body)
 		if err != nil {
-			apiContext.l.Println("[ERROR] deserializing book detail", err)
+			logger.Log("[ERROR] deserializing book detail", logger.ErrorLevel, err)
 
 			rw.WriteHeader(http.StatusBadRequest)
 			data.ToJSON(&GenericError{Message: err.Error()}, rw)
@@ -25,7 +26,7 @@ func (apiContext *APIContext) MiddlewareValidateNewDetail(next http.Handler) htt
 		// validate the product
 		errs := apiContext.v.Validate(detail)
 		if len(errs) != 0 {
-			apiContext.l.Println("[ERROR] validating book detail", errs)
+			logger.Log("[ERROR] validating book detail", logger.ErrorLevel, errs[0])
 
 			// return the validation messages as an array
 			rw.WriteHeader(http.StatusUnprocessableEntity)
@@ -49,7 +50,7 @@ func (apiContext *APIContext) MiddlewareValidateDetailPrice(next http.Handler) h
 
 		err := data.FromJSON(detprice, r.Body)
 		if err != nil {
-			apiContext.l.Println("[ERROR] deserializing price data", err)
+			logger.Log("[ERROR] deserializing price data", logger.ErrorLevel, err)
 
 			rw.WriteHeader(http.StatusBadRequest)
 			data.ToJSON(&GenericError{Message: err.Error()}, rw)
@@ -59,7 +60,7 @@ func (apiContext *APIContext) MiddlewareValidateDetailPrice(next http.Handler) h
 		// validate the product
 		errs := apiContext.v.Validate(detprice)
 		if len(errs) != 0 {
-			apiContext.l.Println("[ERROR] validating price data", errs)
+			logger.Log("[ERROR] validating price data", logger.ErrorLevel, errs[0])
 
 			// return the validation messages as an array
 			rw.WriteHeader(http.StatusUnprocessableEntity)

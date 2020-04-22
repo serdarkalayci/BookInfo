@@ -71,7 +71,8 @@ func main() {
 	v := dto.NewValidation()
 
 	// create the handlers
-	apiContext := handlers.NewAPIContext(l, v)
+	apiContext := handlers.NewAPIContext(v)
+	dbContext := handlers.NewDBContext(v)
 
 	// create a new serve mux and register the handlers
 	sm := mux.NewRouter()
@@ -79,11 +80,8 @@ func main() {
 
 	// handlers for API
 	getR := sm.Methods(http.MethodGet).Subrouter()
-	getR.HandleFunc("/details/{id:[0-9]+}", apiContext.ListSingle)
-
-	putR := sm.Methods(http.MethodPut).Subrouter()
-	putR.HandleFunc("/details", apiContext.Update)
-	putR.Use(apiContext.MiddlewareValidateDetailPrice)
+	getR.HandleFunc("/details/{id:[0-9]+}", dbContext.ListSingle)
+	getR.HandleFunc("/", apiContext.Index)
 
 	// handler for documentation
 	opts := openapimw.RedocOpts{SpecURL: "/swagger.yaml"}

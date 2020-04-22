@@ -1,0 +1,38 @@
+package handlers
+
+import (
+	"net/http"
+
+	opentracing "github.com/opentracing/opentracing-go"
+	"github.com/opentracing/opentracing-go/ext"
+)
+
+// swagger:route GET / index
+// Returns OK if there's no problem
+// responses:
+//	200: RatingResponse
+
+// Index returns OK handles GET requests
+func (p *APIContext) Index(rw http.ResponseWriter, r *http.Request) {
+	tracer := opentracing.GlobalTracer()
+	spanname := "Details.Index"
+	var span opentracing.Span
+
+	wireContext, err := opentracing.GlobalTracer().Extract(
+		opentracing.HTTPHeaders,
+		opentracing.HTTPHeadersCarrier(r.Header))
+	if err != nil {
+		// The method is called without a span context in the http header.
+		span = tracer.StartSpan(spanname)
+	} else {
+		// Create the span referring to the RPC client if available.
+		// If wireContext == nil, a root span will be created.
+		span = opentracing.StartSpan(spanname, ext.RPCServerOption(wireContext))
+	}
+	ext.SpanKindRPCClient.Set(span)
+	ext.HTTPUrl.Set(span, r.URL.RequestURI())
+	ext.HTTPMethod.Set(span, r.Method)
+	defer span.Finish()
+
+	rw.WriteHeader(200)
+}

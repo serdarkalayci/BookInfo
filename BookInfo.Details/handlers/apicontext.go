@@ -2,12 +2,18 @@ package handlers
 
 import (
 	"bookinfo/details/dto"
+	"bookinfo/details/logger"
+	"context"
 	"fmt"
 	"log"
 	"net/http"
+	"os"
 	"strconv"
+	"time"
 
 	"github.com/gorilla/mux"
+	"go.mongodb.org/mongo-driver/mongo"
+	"go.mongodb.org/mongo-driver/mongo/options"
 )
 
 // KeyDetail is a key used for the Rating object in the context
@@ -15,17 +21,61 @@ type KeyDetail struct{}
 
 // APIContext handler for getting and updating Ratings
 type APIContext struct {
-	l *log.Logger
 	v *dto.Validation
 }
 
-// NewAPIContext returns a new APIContext handler with the given logger
-func NewAPIContext(l *log.Logger, v *dto.Validation) *APIContext {
-	return &APIContext{l, v}
+// DBContext is the struct that has a MongoDB connection together with standard APIContext. It's used for handler functions which will use database
+type DBContext struct {
+	MongoClient  mongo.Client
+	DatabaseName string
+	APIContext
 }
 
+// NewAPIContext returns a new APIContext handler with the given logger
+func NewAPIContext(v *dto.Validation) *APIContext {
+	return &APIContext{v}
+}
+
+// NewDBContext returns a new DBContext handler with the given logger
+func NewDBContext(v *dto.Validation) *DBContext {
+	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
+	defer cancel()
+	// We try to get connectionstring value from the environment variables, if not found it falls back to local database
+	connectionString := os.Getenv("ConnectionString")
+	if connectionString == "" {
+		connectionString = "mongodb://localhost:27017"
+		logger.Log("ConnectionString from Env not found, falling back to local DB", logger.DebugLevel)
+	} else {
+		logger.Log(fmt.Sprintf("ConnectionString from Env is used: '%s'", connectionString), logger.DebugLevel)
+	}
+	databaseName := os.Getenv("DatabaseName")
+	if databaseName == "" {
+		databaseName = "detailsDB"
+		logger.Log("DatabaseName from Env not found, falling back to default", logger.DebugLevel)
+	} else {
+		logger.Log(fmt.Sprintf("DatabaseName from Env is used: '%s'", databaseName), logger.DebugLevel)
+	}
+	client, err := mongo.NewClient(options.Client().ApplyURI(connectionString))
+	err = client.Connect(ctx)
+	if err != nil {
+		logger.Log("An error occured while connecting to tha database", logger.ErrorLevel, err)
+		log.Fatal("Cannot connect to database")
+	}
+
+	// Check the connection
+	err = client.Ping(context.TODO(), nil)
+
+	if err != nil {
+		logger.Log("An error occured while connecting to tha database", logger.ErrorLevel, err)
+		log.Fatal("Cannot connect to database")
+	}
+	logger.Log("Connected to MongoDB!", logger.DebugLevel)
+	return &DBContext{*client, databaseName, APIContext{v}}
+}
+
+
 // ErrInvalidRatingPath is an error message when the Rating path is not valid
-var ErrInvalidRatingPath = fmt.Errorf("Invalid Path, path should be /Ratings/[id]")
+var ErrInvalidRatingPath = fmt.Errorf("Invalid Path, path should be /Details/[id]")
 
 // GenericError is a generic error message returned by a server
 type GenericError struct {

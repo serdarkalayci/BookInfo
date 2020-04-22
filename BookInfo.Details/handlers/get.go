@@ -2,6 +2,7 @@ package handlers
 
 import (
 	"encoding/json"
+	"fmt"
 	"io/ioutil"
 	"net/http"
 	"os"
@@ -10,6 +11,7 @@ import (
 
 	"bookinfo/details/data"
 	"bookinfo/details/dto"
+	"bookinfo/details/logger"
 
 	opentracing "github.com/opentracing/opentracing-go"
 	"github.com/opentracing/opentracing-go/ext"
@@ -22,7 +24,7 @@ import (
 //	404: errorResponse
 
 // ListSingle handles GET requests
-func (p *APIContext) ListSingle(rw http.ResponseWriter, r *http.Request) {
+func (ctx *DBContext) ListSingle(rw http.ResponseWriter, r *http.Request) {
 	tracer := opentracing.GlobalTracer()
 	spanname := "Details.ListSingle"
 	var span opentracing.Span
@@ -46,11 +48,12 @@ func (p *APIContext) ListSingle(rw http.ResponseWriter, r *http.Request) {
 
 	id := getBookID(r)
 
-	p.l.Println("[DEBUG] get record id", id)
+	logger.Log(fmt.Sprintf("get record id %d", id), logger.DebugLevel)
 
-	detail, err := data.GetDetailByID(id)
+
+	detail, err := data.GetDetailByID(id, ctx.MongoClient, ctx.DatabaseName)
 	if err != nil {
-		p.l.Println("[ERROR] fetching book detail", err)
+		logger.Log("Error getting Detail", logger.ErrorLevel, err)
 
 		rw.WriteHeader(http.StatusNotFound)
 		data.ToJSON(&GenericError{Message: err.Error()}, rw)
@@ -81,6 +84,6 @@ func (p *APIContext) ListSingle(rw http.ResponseWriter, r *http.Request) {
 	err = data.ToJSON(detail, rw)
 	if err != nil {
 		// we should never be here but log the error just incase
-		p.l.Println("[ERROR] serializing Rating", err)
+		logger.Log("Error serializing Rating", logger.ErrorLevel, err)
 	}
 }
