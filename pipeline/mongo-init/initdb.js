@@ -9,7 +9,8 @@ db.ratings.insertMany([
         "bookId" : 2,
         "currentRating" : 6.1,
         "voteCount": 85
-    }
+    }]
+);
 db.details.insertMany([
     {
 		"bookID":      1,
@@ -27,5 +28,4 @@ db.details.insertMany([
 		"publishDate": new Date(1954, 11, 11, 0, 0, 0),
 		"price":       55.29,
 	}
-])
-])
+]);

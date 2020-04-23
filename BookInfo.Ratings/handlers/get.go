@@ -46,7 +46,6 @@ func (ctx *DBContext) ListSingle(rw http.ResponseWriter, r *http.Request) {
 
 	rating, err := data.GetRatingByID(id, ctx.MongoClient, ctx.DatabaseName)
 	if err != nil {
-		// we should never be here but log the error just incase
 		logger.Log("Error getting Rating", logger.ErrorLevel, err)
 	} else {
 		logger.Log(fmt.Sprintf("Current Rating: %f", rating.CurrentRating), logger.DebugLevel)

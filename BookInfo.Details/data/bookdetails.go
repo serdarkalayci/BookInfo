@@ -45,7 +45,7 @@ type Detail struct {
 	//
 	// required: true
 	// min: 0.01
-	Price float32 `json:"price" bson:"price" validate:"required,gte=0"`
+	Price float64 `json:"price" bson:"price" validate:"required,gte=0"`
 
 	// the number of books in the stock
 	//

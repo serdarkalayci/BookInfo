@@ -50,7 +50,7 @@ func NewDBContext(v *dto.Validation) *DBContext {
 	}
 	databaseName := os.Getenv("DatabaseName")
 	if databaseName == "" {
-		databaseName = "detailsDB"
+		databaseName = "detailDB"
 		logger.Log("DatabaseName from Env not found, falling back to default", logger.DebugLevel)
 	} else {
 		logger.Log(fmt.Sprintf("DatabaseName from Env is used: '%s'", databaseName), logger.DebugLevel)

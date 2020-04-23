@@ -35,6 +35,8 @@ services:
       JAEGER_AGENT_HOST : "jaeger"
       JAEGER_AGENT_PORT : 6831
       JAEGER_SERVICE_NAME: bookinfo-details
+      ConnectionString: "mongodb://host.docker.internal:27017"
+      DatabaseName: detailDB
   reviews:
     build: ../BookInfo.Reviews/.
     container_name: bookinfo_reviews
