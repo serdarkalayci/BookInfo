@@ -44,7 +44,7 @@ func (ctx *DBContext) ListSingle(rw http.ResponseWriter, r *http.Request) {
 
 	logger.Log(fmt.Sprintf("get record id %d", id), logger.DebugLevel)
 
-	rating, err := data.GetRatingByID(id, ctx.MongoClient, ctx.DatabaseName)
+	rating, err := data.GetRatingByID(id, ctx.RedisClient, ctx.DatabaseName)
 	if err != nil {
 		logger.Log("Error getting Rating", logger.ErrorLevel, err)
 	} else {

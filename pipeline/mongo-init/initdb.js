@@ -13,7 +13,7 @@ db.ratings.insertMany([
 );
 db.details.insertMany([
     {
-		"bookID":      1,
+		"bookId":       1,
         "name":        "Lord of the Rings: The Fellowship of the Ring",
 		"isbn":        "123AS123",
 		"author":      "J.R.R. Tolkien",
@@ -21,7 +21,7 @@ db.details.insertMany([
 		"price":       55.29,
     },
     {
-		"bookID":      1,
+		"bookId":      2,
         "name":        "Lord of the Rings: : The Two Towers",
 		"isbn":        "123AS124",
 		"author":      "J.R.R. Tolkien",

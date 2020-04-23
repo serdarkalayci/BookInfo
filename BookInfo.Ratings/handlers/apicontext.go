@@ -3,17 +3,14 @@ package handlers
 import (
 	"bookinfo/ratings/dto"
 	"bookinfo/ratings/logger"
-	"context"
 	"fmt"
 	"log"
 	"net/http"
 	"os"
 	"strconv"
-	"time"
 
+	"github.com/go-redis/redis/v7"
 	"github.com/gorilla/mux"
-	"go.mongodb.org/mongo-driver/mongo"
-	"go.mongodb.org/mongo-driver/mongo/options"
 )
 
 // KeyRating is a key used for the Rating object in the context
@@ -26,8 +23,8 @@ type APIContext struct {
 
 // DBContext is the struct that has a MongoDB connection together with standard APIContext. It's used for handler functions which will use database
 type DBContext struct {
-	MongoClient  mongo.Client
-	DatabaseName string
+	RedisClient  redis.Client
+	DatabaseName int
 	APIContext
 }
 
@@ -38,33 +35,33 @@ func NewAPIContext(v *dto.Validation) *APIContext {
 
 // NewDBContext returns a new DBContext handler with the given logger
 func NewDBContext(v *dto.Validation) *DBContext {
-	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
-	defer cancel()
-	// We try to get connectionstring value from the environment variables, if not found it falls back to local database
-	connectionString := os.Getenv("ConnectionString")
-	if connectionString == "" {
-		connectionString = "mongodb://localhost:27017"
-		logger.Log("ConnectionString from Env not found, falling back to local DB", logger.DebugLevel)
+	// We try to get redisAddress value from the environment variables, if not found it falls back to local database
+	redisAddress := os.Getenv("redisAddress")
+	if redisAddress == "" {
+		redisAddress = "mongodb://localhost:27017"
+		logger.Log("redisAddress from Env not found, falling back to local DB", logger.DebugLevel)
 	} else {
-		logger.Log(fmt.Sprintf("ConnectionString from Env is used: '%s'", connectionString), logger.DebugLevel)
+		logger.Log(fmt.Sprintf("redisAddress from Env is used: '%s'", redisAddress), logger.DebugLevel)
 	}
-	databaseName := os.Getenv("DatabaseName")
-	if databaseName == "" {
-		databaseName = "ratingDB"
+	envDbName := os.Getenv("DatabaseName")
+	databaseName := 0
+	if envDbName == "" {
 		logger.Log("DatabaseName from Env not found, falling back to default", logger.DebugLevel)
 	} else {
+		databaseName, err := strconv.Atoi(envDbName)
+		if err != nil {
+			databaseName = 0
+			logger.Log("DatabaseName from Env is not in expected format, falling back to default", logger.DebugLevel)
+		}
 		logger.Log(fmt.Sprintf("DatabaseName from Env is used: '%s'", databaseName), logger.DebugLevel)
 	}
-	client, err := mongo.NewClient(options.Client().ApplyURI(connectionString))
-	err = client.Connect(ctx)
-	if err != nil {
-		logger.Log("An error occured while connecting to tha database", logger.ErrorLevel, err)
-		log.Fatal("Cannot connect to database")
-	}
+	client := redis.NewClient(&redis.Options{
+		Addr:     redisAddress,
+		Password: "", // no password set
+		DB:       0,  // use default DB
+	})
 
-	// Check the connection
-	err = client.Ping(context.TODO(), nil)
-
+	_, err := client.Ping().Result()
 	if err != nil {
 		logger.Log("An error occured while connecting to tha database", logger.ErrorLevel, err)
 		log.Fatal("Cannot connect to database")

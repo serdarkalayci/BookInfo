@@ -1,11 +1,12 @@
 package data
 
 import (
-	"context"
-	"time"
+	"errors"
+	"fmt"
+	"reflect"
+	"strconv"
 
-	"go.mongodb.org/mongo-driver/bson"
-	"go.mongodb.org/mongo-driver/mongo"
+	"github.com/go-redis/redis/v7"
 )
 
 // Rating defines the structure for an API Rating
@@ -33,14 +34,46 @@ type Rating struct {
 // GetRatingByID returns a single Rating which matches the id from the
 // database.
 // If a Rating is not found this function returns a RatingNotFound error
-func GetRatingByID(id int, dbClient mongo.Client, dbName string) (*Rating, error) {
-	ctx, cancel := context.WithTimeout(context.Background(), 30*time.Second)
-	defer cancel()
-	collection := dbClient.Database(dbName).Collection("ratings")
-	var rating Rating
-	err := collection.FindOne(ctx, bson.M{"bookId": id}).Decode(&rating)
-	if err != nil {
-		return nil, err
+func GetRatingByID(id int, dbClient redis.Client, dbName int) (*Rating, error) {
+	result, err := dbClient.HGetAll(strconv.Itoa(id)).Result()
+	if err == redis.Nil {
+		fmt.Println("key2 does not exist")
+	} else if err != nil {
+		panic(err)
 	}
+	var rating Rating
+	rating.FillStruct(result)
 	return &rating, nil
+}
+
+func SetField(obj interface{}, name string, value interface{}) error {
+	structValue := reflect.ValueOf(obj).Elem()
+	structFieldValue := structValue.FieldByName(name)
+
+	if !structFieldValue.IsValid() {
+		return fmt.Errorf("No such field: %s in obj", name)
+	}
+
+	if !structFieldValue.CanSet() {
+		return fmt.Errorf("Cannot set %s field value", name)
+	}
+
+	structFieldType := structFieldValue.Type()
+	val := reflect.ValueOf(value)
+	if structFieldType != val.Type() {
+		return errors.New("Provided value type didn't match obj field type")
+	}
+
+	structFieldValue.Set(val)
+	return nil
+}
+
+func (r *Rating) FillStruct(m map[string]string) error {
+	for k, v := range m {
+		err := SetField(r, k, v)
+		if err != nil {
+			return err
+		}
+	}
+	return nil
 }
