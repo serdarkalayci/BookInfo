@@ -15,6 +15,8 @@ using OpenTracing;
 using OpenTracing.Util;
 using Jaeger.Samplers;
 using Jaeger;
+using Prometheus;
+using Microsoft.AspNetCore.Http.Extensions;
 
 namespace BookInfo.Reviews
 {
@@ -92,6 +94,7 @@ namespace BookInfo.Reviews
             app.UseEndpoints(endpoints =>
             {
                 endpoints.MapControllers();
+                endpoints.MapMetrics();
             });
         }
     }

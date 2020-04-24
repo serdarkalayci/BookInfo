@@ -22,8 +22,8 @@ services:
       JAEGER_AGENT_HOST : "jaeger"
       JAEGER_AGENT_PORT : 6831
       JAEGER_SERVICE_NAME: bookinfo-ratings
-      ConnectionString: "mongodb://host.docker.internal:27017"
-      DatabaseName: ratingDB
+      RedisAddress: "host.docker.internal:6379"
+      DatabaseName: 0
   details:
     build: ../BookInfo.Details/.
     container_name: bookinfo_details
