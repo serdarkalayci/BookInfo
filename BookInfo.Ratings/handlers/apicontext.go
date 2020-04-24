@@ -36,9 +36,9 @@ func NewAPIContext(v *dto.Validation) *APIContext {
 // NewDBContext returns a new DBContext handler with the given logger
 func NewDBContext(v *dto.Validation) *DBContext {
 	// We try to get redisAddress value from the environment variables, if not found it falls back to local database
-	redisAddress := os.Getenv("redisAddress")
+	redisAddress := os.Getenv("RedisAddress")
 	if redisAddress == "" {
-		redisAddress = "mongodb://localhost:27017"
+		redisAddress = "localhost:6379"
 		logger.Log("redisAddress from Env not found, falling back to local DB", logger.DebugLevel)
 	} else {
 		logger.Log(fmt.Sprintf("redisAddress from Env is used: '%s'", redisAddress), logger.DebugLevel)
@@ -53,7 +53,7 @@ func NewDBContext(v *dto.Validation) *DBContext {
 			databaseName = 0
 			logger.Log("DatabaseName from Env is not in expected format, falling back to default", logger.DebugLevel)
 		}
-		logger.Log(fmt.Sprintf("DatabaseName from Env is used: '%s'", databaseName), logger.DebugLevel)
+		logger.Log(fmt.Sprintf("DatabaseName from Env is used: '%d'", databaseName), logger.DebugLevel)
 	}
 	client := redis.NewClient(&redis.Options{
 		Addr:     redisAddress,
