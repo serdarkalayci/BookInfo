@@ -1,0 +1,110 @@
+{
+	"info": {
+		"_postman_id": "bf8999fa-8bd4-4fe7-907a-3d936c77b9cb",
+		"name": "BookInfo",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "Get Product Page",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "http://localhost:5100/productpage/1",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "5100",
+					"path": [
+						"productpage",
+						"1"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Get Rating",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "http://localhost:5112/ratings/1",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "5112",
+					"path": [
+						"ratings",
+						"1"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Get Detail",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "http://localhost:5113/details/1",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "5113",
+					"path": [
+						"details",
+						"1"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Get Review",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "http://localhost:5111/reviews/1",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "5111",
+					"path": [
+						"reviews",
+						"1"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Get Stock",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "http://localhost:5114/stocks/1",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "5114",
+					"path": [
+						"stocks",
+						"1"
+					]
+				}
+			},
+			"response": []
+		}
+	],
+	"protocolProfileBehavior": {}
+}
