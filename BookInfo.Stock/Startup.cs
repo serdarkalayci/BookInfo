@@ -1,11 +1,6 @@
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
-using Microsoft.AspNetCore.HttpsPolicy;
-using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
@@ -13,10 +8,9 @@ using Microsoft.Extensions.Logging;
 using Microsoft.OpenApi.Models;
 using OpenTracing;
 using OpenTracing.Util;
-using Jaeger.Samplers;
-using Jaeger;
 using Prometheus;
-using Microsoft.AspNetCore.Http.Extensions;
+using BookInfo.Stock.RedisDatabase;
+
 
 namespace BookInfo.Stock
 {
@@ -33,11 +27,22 @@ namespace BookInfo.Stock
         public void ConfigureServices(IServiceCollection services)
         {
             services.AddControllers();
+            // Redis database service
+            if (System.Environment.GetEnvironmentVariable("RedisAddress") == null) 
+                    Environment.SetEnvironmentVariable("RedisAddress", "127.0.0.1:6379");
+            if (System.Environment.GetEnvironmentVariable("RedisPassword") == null) 
+                    Environment.SetEnvironmentVariable("RedisPassword", "");
+            if (System.Environment.GetEnvironmentVariable("DatabaseName") == null) 
+                    Environment.SetEnvironmentVariable("DatabaseName", "1");
+            services.AddSingleton<IRedisDatabaseProvider, RedisDatabaseProvider>();
+
+            // Swagger
             services.AddSwaggerGen(c =>
             {
                 c.SwaggerDoc("v1", new OpenApiInfo { Title = "Book Stocks API", Version = "v1" });
             });
 
+            // OpenTracing
             services.AddOpenTracing();
 
             // Adds the Jaeger Tracer.

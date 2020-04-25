@@ -1,14 +1,6 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
-using System.Net.Http;
-using System.Net.Http.Headers;
-using System.Text.Json;
-using BookInfo.Stock.Data;
-using BookInfo.Stock.Dto;
+using BookInfo.Stock.RedisDatabase;
 
 namespace BookInfo.Stock.Controllers
 {
@@ -17,10 +9,12 @@ namespace BookInfo.Stock.Controllers
     public class StocksController : ControllerBase
     {
         private readonly ILogger<StocksController> _logger;
+        private readonly IRedisDatabaseProvider _redisDatabaseProvider;
 
-        public StocksController(ILogger<StocksController> logger)
+        public StocksController(ILogger<StocksController> logger, IRedisDatabaseProvider redisDatabaseProvider)
         {
             _logger = logger;
+            _redisDatabaseProvider = redisDatabaseProvider;
         }
 
         [HttpGet]
@@ -34,20 +28,13 @@ namespace BookInfo.Stock.Controllers
         [Route("{bookId:int}")]
         public IActionResult GetSingle(int bookId)
         {
-            var stock = Data.BookStocks.Stocks.Where(c => c.BookID == bookId).FirstOrDefault();
-            if (stock == null) 
-            {
-                return NotFound();
-            }
-            else
-            {
-                var result = new Dto.Stock() {
-                    CurrentStock = stock.StockCount
-                };
-                return Ok(result);
-            }
-            
-            //return Ok(Data.BookReviews.Reviews.Where(c => c.BookId == bookId));
+            Data.BookStocks stockData = new Data.BookStocks();
+            int currentStock = stockData.GetStock(_redisDatabaseProvider, bookId);
+
+            var result = new Dto.Stock() {
+                CurrentStock = currentStock
+            };
+            return Ok(result);
         }
     }
 }
