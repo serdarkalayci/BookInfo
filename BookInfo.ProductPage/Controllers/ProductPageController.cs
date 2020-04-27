@@ -36,6 +36,7 @@ namespace BookInfo.ProductPage.Controllers
             Dto.BookReviewResult revresult = await GetReview(bookId);
             Dto.BookDetailResult detresult = await GetDetail(bookId);
             Dto.ProductPageResponse response = new Dto.ProductPageResponse() {
+                BookId = bookId,
                 bookDetailResult = detresult,
                 bookReviewResult = revresult
                 

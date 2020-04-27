@@ -7,5 +7,5 @@ type StockInfo struct {
 	//
 	// required: false
 	// min: 1
-	CurrentStock int `json:"currentstock"` // the number of books in the stock
+	CurrentStock int `json:"currentStock"` // the number of books in the stock
 }

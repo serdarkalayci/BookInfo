@@ -9,7 +9,7 @@ type DetailPrice struct {
 	//
 	// required: false
 	// min: 1
-	BookID int `json:"bookid"` // Unique identifier for the book
+	BookID int `json:"bookId"` // Unique identifier for the book
 
 	// the price of the book
 	//
@@ -39,7 +39,7 @@ type Detail struct {
 	// the publish date of the book
 	//
 	// required: true
-	PublishDate time.Time `json:"publishdate" validate:"required"`
+	PublishDate time.Time `json:"publishDate" validate:"required"`
 
 	// the price of the book
 	//
@@ -51,5 +51,5 @@ type Detail struct {
 	//
 	// required: false
 	// min: 0
-	CurrentStock int `json:"currentstock"` // the number of books in the stock
+	CurrentStock int `json:"currentStock"` // the number of books in the stock
 }

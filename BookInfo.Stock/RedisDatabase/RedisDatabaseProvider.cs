@@ -18,6 +18,7 @@ namespace BookInfo.Stock.RedisDatabase
                 string databaseName = Environment.GetEnvironmentVariable("DatabaseName");
                 StringBuilder sb = new StringBuilder();
                 sb.AppendFormat("{0},defaultDatabase={1},password={2}", redisAddress, databaseName, redisPassword);
+                Console.WriteLine("Redis Connection: {0}", sb.ToString());
                 _redisMultiplexer = ConnectionMultiplexer.Connect(sb.ToString());
             }
             return _redisMultiplexer.GetDatabase();

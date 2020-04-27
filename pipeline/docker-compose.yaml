@@ -58,6 +58,8 @@ services:
       JAEGER_AGENT_HOST : "jaeger"
       JAEGER_AGENT_PORT : 6831
       JAEGER_SERVICE_NAME: bookinfo-stock
+      RedisAddress: "host.docker.internal:6379"
+      DatabaseName: 1      
   jaeger:
     image: jaegertracing/all-in-one:latest
     container_name: bookinfo_jaeger

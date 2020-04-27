@@ -1,7 +1,7 @@
+using System.Text.Json.Serialization;
+
 namespace BookInfo.Reviews.Dto
 {
-    using System.Text.Json.Serialization;
-
     public class BookReviewResult 
     {
         [JsonPropertyName("bookId")]
@@ -18,9 +18,9 @@ namespace BookInfo.Reviews.Dto
     {
         [JsonPropertyName("reviewer")]
         public string Reviewer { get; set; }
-        [JsonPropertyName("reviewdate")]
+        [JsonPropertyName("reviewDate")]
         public System.DateTime ReviewDate { get; set; }
-        [JsonPropertyName("reviewtext")]
+        [JsonPropertyName("reviewText")]
         public string ReviewText { get; set; }
 
         public BookReview(Models.BookReview original) 

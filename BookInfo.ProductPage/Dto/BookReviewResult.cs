@@ -1,11 +1,9 @@
+using System.Text.Json.Serialization;
+
 namespace BookInfo.ProductPage.Dto
 {
-    using System.Text.Json.Serialization;
-
     public class BookReviewResult 
     {
-        [JsonPropertyName("bookId")]
-        public int BookId { get; set; }
         [JsonPropertyName("currentRating")]
         public decimal Rating { get; set; }
         [JsonPropertyName("voteCount")]
@@ -18,9 +16,9 @@ namespace BookInfo.ProductPage.Dto
     {
         [JsonPropertyName("reviewer")]
         public string Reviewer { get; set; }
-        [JsonPropertyName("reviewdate")]
+        [JsonPropertyName("reviewDate")]
         public System.DateTime ReviewDate { get; set; }
-        [JsonPropertyName("reviewtext")]
+        [JsonPropertyName("reviewText")]
         public string ReviewText { get; set; }
     }
     
