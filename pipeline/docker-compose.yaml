@@ -48,6 +48,7 @@ services:
       JAEGER_AGENT_HOST : "jaeger"
       JAEGER_AGENT_PORT : 6831
       JAEGER_SERVICE_NAME: bookinfo-reviews
+      ReviewConnStr: "Server=host.docker.internal;Port=5432;Database=reviewDb;User Id=postgres;Password=example;"
   stocks:
     build: ../BookInfo.Stock/.
     container_name: bookinfo_stock

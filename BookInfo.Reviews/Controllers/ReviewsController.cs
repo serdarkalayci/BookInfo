@@ -7,6 +7,9 @@ using Microsoft.Extensions.Logging;
 using System.Net.Http;
 using System.Net.Http.Headers;
 using System.Text.Json;
+using BookInfo.Reviews.Data;
+using Microsoft.EntityFrameworkCore;
+using BatMap;
 
 namespace BookInfo.Reviews.Controllers
 {
@@ -15,10 +18,12 @@ namespace BookInfo.Reviews.Controllers
     public class ReviewsController : ControllerBase
     {
         private readonly ILogger<ReviewsController> _logger;
+        private readonly ReviewContext _reviewContext;
 
-        public ReviewsController(ILogger<ReviewsController> logger)
+        public ReviewsController(ILogger<ReviewsController> logger, ReviewContext reviewContext)
         {
             _logger = logger;
+            _reviewContext = reviewContext;
         }
 
         [HttpGet]
@@ -32,18 +37,16 @@ namespace BookInfo.Reviews.Controllers
         [Route("{bookId:int}")]
         public async Task<IActionResult> GetSingle(int bookId)
         {
-            Dto.BookReviewResult result = await GetRating(bookId);
-            List<Dto.BookReview> reviews = new List<Dto.BookReview>();
-            foreach (var review in Data.BookReviews.Reviews.Where(c => c.BookId == bookId))
-            {
-                reviews.Add((Dto.BookReview)review);
-            }
-            result.Reviews = reviews.ToArray();
+            Dto.ReviewResult result = await GetRating(bookId);
+            var reviews = _reviewContext.Reviews.Where(x => x.BookId == bookId);
+            var reviewsDto = reviews.Map<Models.Review, Dto.Review>();
+            //var reviewsDto = Mapper.Map<Dto.Review>(reviews);
+            result.Reviews = reviewsDto.ToArray();
             return Ok(result);
             //return Ok(Data.BookReviews.Reviews.Where(c => c.BookId == bookId));
         }
 
-        private async Task<Dto.BookReviewResult> GetRating(int bookId) 
+        private async Task<Dto.ReviewResult> GetRating(int bookId) 
         {
             HttpClient client = new HttpClient();
             client.DefaultRequestHeaders.Accept.Clear();
@@ -52,7 +55,7 @@ namespace BookInfo.Reviews.Controllers
             string serviceURL = System.Environment.GetEnvironmentVariable("RATING_URL") ?? "http://localhost:5112";
             serviceURL += "/ratings/" + bookId;
             var streamTask = client.GetStreamAsync(serviceURL);
-            var result = await JsonSerializer.DeserializeAsync<Dto.BookReviewResult>(await streamTask);
+            var result = await JsonSerializer.DeserializeAsync<Dto.ReviewResult>(await streamTask);
             return result;        
         }
     }

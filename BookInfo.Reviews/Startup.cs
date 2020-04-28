@@ -17,6 +17,8 @@ using Jaeger.Samplers;
 using Jaeger;
 using Prometheus;
 using Microsoft.AspNetCore.Http.Extensions;
+using Microsoft.EntityFrameworkCore;
+using BookInfo.Reviews.Data;
 
 namespace BookInfo.Reviews
 {
@@ -33,11 +35,19 @@ namespace BookInfo.Reviews
         public void ConfigureServices(IServiceCollection services)
         {
             services.AddControllers();
+            // EF
+            if (Environment.GetEnvironmentVariable("ReviewConnStr") == null) 
+                    Environment.SetEnvironmentVariable("ReviewConnStr", "Server=127.0.0.1;Port=5432;Database=reviewDb;User Id=postgres;Password=example;");
+            services.AddDbContext<ReviewContext>(options =>
+                options.UseNpgsql(Environment.GetEnvironmentVariable("ReviewConnStr")));
+
+            // Swagger
             services.AddSwaggerGen(c =>
             {
                 c.SwaggerDoc("v1", new OpenApiInfo { Title = "Book Reviews API", Version = "v1" });
             });
 
+            // Open Tracing
             services.AddOpenTracing();
 
             // Adds the Jaeger Tracer.
@@ -45,13 +55,13 @@ namespace BookInfo.Reviews
             {
                 string serviceName = serviceProvider.GetRequiredService<Microsoft.AspNetCore.Hosting.IWebHostEnvironment>().ApplicationName;
 
-                if (System.Environment.GetEnvironmentVariable("JAEGER_SERVICE_NAME") == null) 
+                if (Environment.GetEnvironmentVariable("JAEGER_SERVICE_NAME") == null) 
                     Environment.SetEnvironmentVariable("JAEGER_SERVICE_NAME", serviceName);
-                if (System.Environment.GetEnvironmentVariable("JAEGER_AGENT_HOST") == null) 
+                if (Environment.GetEnvironmentVariable("JAEGER_AGENT_HOST") == null) 
                     Environment.SetEnvironmentVariable("JAEGER_AGENT_HOST", "localhost");                
-                if (System.Environment.GetEnvironmentVariable("JAEGER_AGENT_PORT") == null) 
+                if (Environment.GetEnvironmentVariable("JAEGER_AGENT_PORT") == null) 
                     Environment.SetEnvironmentVariable("JAEGER_AGENT_PORT", "6831");                
-                if (System.Environment.GetEnvironmentVariable("JAEGER_SAMPLER_TYPE") == null) 
+                if (Environment.GetEnvironmentVariable("JAEGER_SAMPLER_TYPE") == null) 
                     Environment.SetEnvironmentVariable("JAEGER_SAMPLER_TYPE", "const");
 
                 var loggerFactory = new LoggerFactory();

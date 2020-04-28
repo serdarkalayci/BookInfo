@@ -2,7 +2,7 @@ using System.Text.Json.Serialization;
 
 namespace BookInfo.Reviews.Dto
 {
-    public class BookReviewResult 
+    public class ReviewResult 
     {
         [JsonPropertyName("bookId")]
         public int BookId { get; set; }
@@ -11,10 +11,10 @@ namespace BookInfo.Reviews.Dto
         [JsonPropertyName("voteCount")]
         public int VoteCount { get; set; }
         [JsonPropertyName("reviews")]
-        public BookReview[] Reviews { get; set; }
+        public Review[] Reviews { get; set; }
     }
 
-    public struct BookReview
+    public struct Review
     {
         [JsonPropertyName("reviewer")]
         public string Reviewer { get; set; }
@@ -23,14 +23,14 @@ namespace BookInfo.Reviews.Dto
         [JsonPropertyName("reviewText")]
         public string ReviewText { get; set; }
 
-        public BookReview(Models.BookReview original) 
+        public Review(Models.Review original) 
         {
             this.Reviewer = original.Reviewer;
             this.ReviewDate = original.ReviewDate;
             this.ReviewText = original.ReviewText;
         }
 
-        public static explicit operator BookReview(Models.BookReview original) => new BookReview(original);
+        public static explicit operator Review(Models.Review original) => new Review(original);
     }
     
 }
