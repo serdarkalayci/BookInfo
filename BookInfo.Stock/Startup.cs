@@ -28,11 +28,11 @@ namespace BookInfo.Stock
         {
             services.AddControllers();
             // Redis database service
-            if (System.Environment.GetEnvironmentVariable("RedisAddress") == null) 
+            if (Environment.GetEnvironmentVariable("RedisAddress") == null) 
                     Environment.SetEnvironmentVariable("RedisAddress", "127.0.0.1:6379");
-            if (System.Environment.GetEnvironmentVariable("RedisPassword") == null) 
+            if (Environment.GetEnvironmentVariable("RedisPassword") == null) 
                     Environment.SetEnvironmentVariable("RedisPassword", "");
-            if (System.Environment.GetEnvironmentVariable("DatabaseName") == null) 
+            if (Environment.GetEnvironmentVariable("DatabaseName") == null) 
                     Environment.SetEnvironmentVariable("DatabaseName", "1");
             services.AddSingleton<IRedisDatabaseProvider, RedisDatabaseProvider>();
 
@@ -50,13 +50,13 @@ namespace BookInfo.Stock
             {
                 string serviceName = serviceProvider.GetRequiredService<Microsoft.AspNetCore.Hosting.IWebHostEnvironment>().ApplicationName;
 
-                if (System.Environment.GetEnvironmentVariable("JAEGER_SERVICE_NAME") == null) 
+                if (Environment.GetEnvironmentVariable("JAEGER_SERVICE_NAME") == null) 
                     Environment.SetEnvironmentVariable("JAEGER_SERVICE_NAME", serviceName);
-                if (System.Environment.GetEnvironmentVariable("JAEGER_AGENT_HOST") == null) 
+                if (Environment.GetEnvironmentVariable("JAEGER_AGENT_HOST") == null) 
                     Environment.SetEnvironmentVariable("JAEGER_AGENT_HOST", "localhost");                
-                if (System.Environment.GetEnvironmentVariable("JAEGER_AGENT_PORT") == null) 
+                if (Environment.GetEnvironmentVariable("JAEGER_AGENT_PORT") == null) 
                     Environment.SetEnvironmentVariable("JAEGER_AGENT_PORT", "6831");                
-                if (System.Environment.GetEnvironmentVariable("JAEGER_SAMPLER_TYPE") == null) 
+                if (Environment.GetEnvironmentVariable("JAEGER_SAMPLER_TYPE") == null) 
                     Environment.SetEnvironmentVariable("JAEGER_SAMPLER_TYPE", "const");
 
                 var loggerFactory = new LoggerFactory();

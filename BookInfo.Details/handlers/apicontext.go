@@ -5,7 +5,6 @@ import (
 	"bookinfo/details/logger"
 	"context"
 	"fmt"
-	"log"
 	"net/http"
 	"os"
 	"strconv"
@@ -59,20 +58,18 @@ func NewDBContext(v *dto.Validation) *DBContext {
 	err = client.Connect(ctx)
 	if err != nil {
 		logger.Log("An error occured while connecting to tha database", logger.ErrorLevel, err)
-		log.Fatal("Cannot connect to database")
-	}
+	} else {
 
-	// Check the connection
-	err = client.Ping(context.TODO(), nil)
+		// Check the connection
+		err = client.Ping(context.TODO(), nil)
 
-	if err != nil {
-		logger.Log("An error occured while connecting to tha database", logger.ErrorLevel, err)
-		log.Fatal("Cannot connect to database")
+		if err != nil {
+			logger.Log("An error occured while connecting to tha database", logger.ErrorLevel, err)
+		}
+		logger.Log("Connected to MongoDB!", logger.DebugLevel)
 	}
-	logger.Log("Connected to MongoDB!", logger.DebugLevel)
 	return &DBContext{*client, databaseName, APIContext{v}}
 }
-
 
 // ErrInvalidRatingPath is an error message when the Rating path is not valid
 var ErrInvalidRatingPath = fmt.Errorf("Invalid Path, path should be /Details/[id]")

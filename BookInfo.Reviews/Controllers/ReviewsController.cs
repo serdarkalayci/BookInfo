@@ -40,10 +40,8 @@ namespace BookInfo.Reviews.Controllers
             Dto.ReviewResult result = await GetRating(bookId);
             var reviews = _reviewContext.Reviews.Where(x => x.BookId == bookId);
             var reviewsDto = reviews.Map<Models.Review, Dto.Review>();
-            //var reviewsDto = Mapper.Map<Dto.Review>(reviews);
             result.Reviews = reviewsDto.ToArray();
             return Ok(result);
-            //return Ok(Data.BookReviews.Reviews.Where(c => c.BookId == bookId));
         }
 
         private async Task<Dto.ReviewResult> GetRating(int bookId) 

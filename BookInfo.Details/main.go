@@ -38,7 +38,7 @@ func main() {
 	// Sample configuration for testing. Use constant sampling to sample every trace
 	// and enable LogSpan to log every span via configured Logger.
 	cfg, err := jaegercfg.FromEnv()
-	if err != nil {
+	if err != nil || cfg.ServiceName == "" {
 		cfg = &jaegercfg.Configuration{
 			ServiceName: "BookInfo.Details",
 			Sampler: &jaegercfg.SamplerConfig{
@@ -82,6 +82,8 @@ func main() {
 	getR := sm.Methods(http.MethodGet).Subrouter()
 	getR.HandleFunc("/details/{id:[0-9]+}", dbContext.ListSingle)
 	getR.HandleFunc("/", apiContext.Index)
+	getR.HandleFunc("/health/live", apiContext.Live)
+	getR.HandleFunc("/health/ready", dbContext.Ready)
 
 	// handler for documentation
 	opts := openapimw.RedocOpts{SpecURL: "/swagger.yaml"}

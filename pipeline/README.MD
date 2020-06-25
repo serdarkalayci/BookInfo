@@ -9,6 +9,7 @@ and all applications including Jaeger, Prometheus and Grafana by typing
 The Redis databases by default are arranged as follows:
 
 0: Rating
+
 1: Stock
 
 Redis databases can be initialized by connecting to the container's console by 
@@ -27,6 +28,7 @@ HMSET bookId:2 currentRating 9.82 voteCount 21562
 disconnect from Rating database by typing `exit` and connect Stock database by typing
 
 `redis-cli -u redis://127.0.0.1:6379/1`
+
 and inserting Stock records
 ```
 SET "1" "127"
