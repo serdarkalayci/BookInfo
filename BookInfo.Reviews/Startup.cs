@@ -19,11 +19,15 @@ using Prometheus;
 using Microsoft.AspNetCore.Http.Extensions;
 using Microsoft.EntityFrameworkCore;
 using BookInfo.Reviews.Data;
+using Microsoft.Extensions.Diagnostics.HealthChecks;
+using Microsoft.AspNetCore.Diagnostics.HealthChecks;
 
 namespace BookInfo.Reviews
 {
     public class Startup
     {
+        private const string Liveness = "Liveness";
+        private const string Readiness = "Readiness";
         public Startup(IConfiguration configuration)
         {
             Configuration = configuration;
@@ -37,7 +41,7 @@ namespace BookInfo.Reviews
             services.AddControllers();
             // EF
             if (Environment.GetEnvironmentVariable("ReviewConnStr") == null) 
-                    Environment.SetEnvironmentVariable("ReviewConnStr", "Server=127.0.0.1;Port=5432;Database=reviewDb;User Id=postgres;Password=example;");
+                    Environment.SetEnvironmentVariable("ReviewConnStr", "Server=127.0.0.1;Port=5432;Database=reviewdb;User Id=postgres;Password=example;");
             services.AddDbContext<ReviewContext>(options =>
                 options.UseNpgsql(Environment.GetEnvironmentVariable("ReviewConnStr")));
 
@@ -46,6 +50,12 @@ namespace BookInfo.Reviews
             {
                 c.SwaggerDoc("v1", new OpenApiInfo { Title = "Book Reviews API", Version = "v1" });
             });
+            //HealthChecks
+            services.AddHealthChecks()
+                    .AddNpgSql(npgsqlConnectionString:Environment.GetEnvironmentVariable("ReviewConnStr"),
+                    healthQuery: "SELECT 1;",
+                    failureStatus: HealthStatus.Degraded,
+                    tags: new[] { Readiness });
 
             // Open Tracing
             services.AddOpenTracing();
@@ -105,6 +115,15 @@ namespace BookInfo.Reviews
             {
                 endpoints.MapControllers();
                 endpoints.MapMetrics();
+                endpoints.MapHealthChecks("/liveness", new HealthCheckOptions
+                {
+                    Predicate = check => check.Tags.Contains(Liveness)
+                });
+
+                endpoints.MapHealthChecks("/readiness", new HealthCheckOptions
+                {
+                    Predicate = check => check.Tags.Contains(Readiness)
+                });
             });
         }
     }
