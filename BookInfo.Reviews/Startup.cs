@@ -21,6 +21,7 @@ using Microsoft.EntityFrameworkCore;
 using BookInfo.Reviews.Data;
 using Microsoft.Extensions.Diagnostics.HealthChecks;
 using Microsoft.AspNetCore.Diagnostics.HealthChecks;
+using Microsoft.AspNetCore.Http;
 
 namespace BookInfo.Reviews
 {
@@ -41,7 +42,7 @@ namespace BookInfo.Reviews
             services.AddControllers();
             // EF
             if (Environment.GetEnvironmentVariable("ReviewConnStr") == null) 
-                    Environment.SetEnvironmentVariable("ReviewConnStr", "Server=127.0.0.1;Port=5432;Database=reviewdb;User Id=postgres;Password=example;");
+                    Environment.SetEnvironmentVariable("ReviewConnStr", "Server=127.0.0.1;Port=5432;Database=reviewDb;User Id=postgres;Password=example;");
             services.AddDbContext<ReviewContext>(options =>
                 options.UseNpgsql(Environment.GetEnvironmentVariable("ReviewConnStr")));
 
@@ -117,12 +118,22 @@ namespace BookInfo.Reviews
                 endpoints.MapMetrics();
                 endpoints.MapHealthChecks("/liveness", new HealthCheckOptions
                 {
-                    Predicate = check => check.Tags.Contains(Liveness)
+                    Predicate = check => check.Tags.Contains(Liveness),
+                    ResultStatusCodes =
+                    {
+                        [HealthStatus.Healthy] = StatusCodes.Status200OK,
+                        [HealthStatus.Unhealthy] = StatusCodes.Status503ServiceUnavailable
+                    }
                 });
 
                 endpoints.MapHealthChecks("/readiness", new HealthCheckOptions
                 {
-                    Predicate = check => check.Tags.Contains(Readiness)
+                    Predicate = check => check.Tags.Contains(Readiness),
+                    ResultStatusCodes =
+                    {
+                        [HealthStatus.Healthy] = StatusCodes.Status200OK,
+                        [HealthStatus.Degraded] = StatusCodes.Status503ServiceUnavailable
+                    }
                 });
             });
         }

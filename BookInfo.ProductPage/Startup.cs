@@ -17,11 +17,17 @@ using Jaeger.Samplers;
 using Jaeger;
 using Prometheus;
 using Microsoft.AspNetCore.Http.Extensions;
+using BookInfo.ProductPage.Controllers;
+using Microsoft.AspNetCore.Diagnostics.HealthChecks;
+using Microsoft.Extensions.Diagnostics.HealthChecks;
+using Microsoft.AspNetCore.Http;
 
 namespace BookInfo.ProductPage
 {
     public class Startup
     {
+        private const string Liveness = "Liveness";
+        private const string Readiness = "Readiness";
         public Startup(IConfiguration configuration)
         {
             Configuration = configuration;
@@ -38,6 +44,11 @@ namespace BookInfo.ProductPage
                 c.SwaggerDoc("v1", new OpenApiInfo { Title = "Book Reviews API", Version = "v1" });
             });
             
+            //HealthChecks
+            services.AddHealthChecks()
+                    .AddCheck<ReviewsHealthCheck>("reviews_health_check", failureStatus: HealthStatus.Unhealthy,tags: new[] { Readiness })
+                    .AddCheck<DetailsHealthCheck>("details_health_check", failureStatus: HealthStatus.Unhealthy,tags: new[] { Readiness });
+                    
             services.AddOpenTracing();
 
             // Adds the Jaeger Tracer.
@@ -98,6 +109,25 @@ namespace BookInfo.ProductPage
             {
                 endpoints.MapControllers();
                 endpoints.MapMetrics();
+                endpoints.MapHealthChecks("/liveness", new HealthCheckOptions
+                {
+                    Predicate = check => check.Tags.Contains(Liveness),
+                    ResultStatusCodes =
+                    {
+                        [HealthStatus.Healthy] = StatusCodes.Status200OK,
+                        [HealthStatus.Unhealthy] = StatusCodes.Status503ServiceUnavailable
+                    }
+                });
+
+                endpoints.MapHealthChecks("/readiness", new HealthCheckOptions
+                {
+                    Predicate = check => check.Tags.Contains(Readiness),
+                    ResultStatusCodes =
+                    {
+                        [HealthStatus.Healthy] = StatusCodes.Status200OK,
+                        [HealthStatus.Unhealthy] = StatusCodes.Status503ServiceUnavailable
+                    }
+                });
             });
         }
     }

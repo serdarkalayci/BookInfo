@@ -10,12 +10,16 @@ using OpenTracing;
 using OpenTracing.Util;
 using Prometheus;
 using BookInfo.Stock.RedisDatabase;
-
+using Microsoft.Extensions.Diagnostics.HealthChecks;
+using Microsoft.AspNetCore.Diagnostics.HealthChecks;
+using Microsoft.AspNetCore.Http;
 
 namespace BookInfo.Stock
 {
     public class Startup
     {
+        private const string Liveness = "Liveness";
+        private const string Readiness = "Readiness";
         public Startup(IConfiguration configuration)
         {
             Configuration = configuration;
@@ -41,6 +45,14 @@ namespace BookInfo.Stock
             {
                 c.SwaggerDoc("v1", new OpenApiInfo { Title = "Book Stocks API", Version = "v1" });
             });
+            
+            //HealthChecks
+            services.AddHealthChecks()
+                    .AddRedis(redisConnectionString:Environment.GetEnvironmentVariable("RedisAddress") + 
+                              ",defaultDatabase=" + Environment.GetEnvironmentVariable("DatabaseName") + 
+                              ",password=" + Environment.GetEnvironmentVariable("RedisPassword"),
+                    failureStatus: HealthStatus.Degraded,
+                    tags: new[] { Readiness });
 
             // OpenTracing
             services.AddOpenTracing();
@@ -101,6 +113,25 @@ namespace BookInfo.Stock
             {
                 endpoints.MapControllers();
                 endpoints.MapMetrics();
+                endpoints.MapHealthChecks("/liveness", new HealthCheckOptions
+                {
+                    Predicate = check => check.Tags.Contains(Liveness),
+                    ResultStatusCodes =
+                    {
+                        [HealthStatus.Healthy] = StatusCodes.Status200OK,
+                        [HealthStatus.Unhealthy] = StatusCodes.Status503ServiceUnavailable
+                    }
+                });
+
+                endpoints.MapHealthChecks("/readiness", new HealthCheckOptions
+                {
+                    Predicate = check => check.Tags.Contains(Readiness),
+                    ResultStatusCodes =
+                    {
+                        [HealthStatus.Healthy] = StatusCodes.Status200OK,
+                        [HealthStatus.Degraded] = StatusCodes.Status503ServiceUnavailable
+                    }
+                });
             });
         }
     }
