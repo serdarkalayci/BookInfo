@@ -10,7 +10,9 @@ services:
     environment:
       - ALLOW_EMPTY_PASSWORD=yes
   mongo:
-    image: bookinfo-mongo
+    build:
+      context: .
+      dockerfile: ./mongo-init/dockerfile
     container_name: bookinfo-mongo
     restart: always
     ports:

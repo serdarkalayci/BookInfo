@@ -4,7 +4,6 @@ import (
 	"bookinfo/ratings/dto"
 	"bookinfo/ratings/logger"
 	"fmt"
-	"log"
 	"net/http"
 	"os"
 	"strconv"
@@ -64,7 +63,6 @@ func NewDBContext(v *dto.Validation) *DBContext {
 	_, err := client.Ping().Result()
 	if err != nil {
 		logger.Log("An error occured while connecting to tha database", logger.ErrorLevel, err)
-		log.Fatal("Cannot connect to database")
 	}
 	logger.Log("Connected to MongoDB!", logger.DebugLevel)
 	return &DBContext{*client, databaseName, APIContext{v}}
