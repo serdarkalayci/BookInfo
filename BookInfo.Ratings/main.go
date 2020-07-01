@@ -80,6 +80,8 @@ func main() {
 	getR := sm.Methods(http.MethodGet).Subrouter()
 	getR.HandleFunc("/ratings/{id:[0-9]+}", dbContext.ListSingle)
 	getR.HandleFunc("/", apiContext.Index)
+	getR.HandleFunc("/health/live", apiContext.Live)
+	getR.HandleFunc("/health/ready", dbContext.Ready)
 
 	// handler for documentation
 	opts := openapimw.RedocOpts{SpecURL: "/swagger.yaml"}
