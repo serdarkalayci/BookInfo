@@ -45,6 +45,7 @@ services:
     environment: 
       BASE_URL : "http://+:5111"
       RATING_URL : "http://ratings:5112"
+      DETAIL_URL : "http://details:5113"
       JAEGER_AGENT_HOST : "jaeger"
       JAEGER_AGENT_PORT : 6831
       JAEGER_SERVICE_NAME: bookinfo-reviews

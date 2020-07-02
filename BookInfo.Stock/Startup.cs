@@ -12,6 +12,7 @@ using Prometheus;
 using BookInfo.Stock.RedisDatabase;
 using Microsoft.Extensions.Diagnostics.HealthChecks;
 using Microsoft.AspNetCore.Diagnostics.HealthChecks;
+using Microsoft.AspNetCore.Http;
 
 
 namespace BookInfo.Stock
@@ -115,12 +116,22 @@ namespace BookInfo.Stock
                 endpoints.MapMetrics();
                 endpoints.MapHealthChecks("/liveness", new HealthCheckOptions
                 {
-                    Predicate = check => check.Tags.Contains(Liveness)
+                    Predicate = check => check.Tags.Contains(Liveness),
+                    ResultStatusCodes =
+                    {
+                        [HealthStatus.Healthy] = StatusCodes.Status200OK,
+                        [HealthStatus.Unhealthy] = StatusCodes.Status503ServiceUnavailable
+                    }
                 });
 
                 endpoints.MapHealthChecks("/readiness", new HealthCheckOptions
                 {
-                    Predicate = check => check.Tags.Contains(Readiness)
+                    Predicate = check => check.Tags.Contains(Readiness),
+                    ResultStatusCodes =
+                    {
+                        [HealthStatus.Healthy] = StatusCodes.Status200OK,
+                        [HealthStatus.Degraded] = StatusCodes.Status503ServiceUnavailable
+                    }
                 });
             });
         }
