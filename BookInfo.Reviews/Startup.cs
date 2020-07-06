@@ -97,6 +97,9 @@ namespace BookInfo.Reviews
             {
                 app.UseDeveloperExceptionPage();
             }
+            //Prometheus Metrics
+            app.UseMetricServer();
+            app.UseRequestMiddleware();  
 
             // Enable middleware to serve generated Swagger as a JSON endpoint.
             app.UseSwagger();

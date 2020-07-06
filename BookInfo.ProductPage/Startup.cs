@@ -87,6 +87,9 @@ namespace BookInfo.ProductPage
             {
                 app.UseDeveloperExceptionPage();
             }
+            //Prometheus Metrics
+            app.UseMetricServer();
+            app.UseRequestMiddleware();  
 
             //Standard http metrics for Prometheus
             app.UseHttpMetrics();
