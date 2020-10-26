@@ -1,0 +1,52 @@
+kind: Deployment
+apiVersion: apps/v1
+metadata:
+  name: productpage
+  namespace: bookinfo
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: productpage
+  template:
+    metadata:
+      labels:
+        app: productpage
+    spec:
+      containers:
+        - name: productpage
+          readinessProbe:
+            httpGet:
+              path: /readiness
+              port: 5110
+              scheme: HTTP
+            initialDelaySeconds: 3
+            timeoutSeconds: 2
+            periodSeconds: 3
+            successThreshold: 1
+            failureThreshold: 5
+          terminationMessagePath: /dev/termination-log
+          livenessProbe:
+            httpGet:
+              path: /liveness
+              port: 5110
+              scheme: HTTP
+            initialDelaySeconds: 3
+            timeoutSeconds: 2
+            periodSeconds: 3
+            successThreshold: 1
+            failureThreshold: 5
+          env:
+            - name: BASE_URL
+              value: 'http://*:5110'
+            - name: REVIEW_URL
+              value: reviews
+            - name: DETAIL_URL
+             value: details
+          ports:
+            - containerPort: 5110
+              protocol: TCP
+          imagePullPolicy: IfNotPresent
+          terminationMessagePolicy: File
+          image: serdarkalayci/bookinfo-productpage:14
+      restartPolicy: Always

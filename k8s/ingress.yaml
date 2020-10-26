@@ -1,0 +1,34 @@
+---
+    apiVersion: extensions/v1beta1
+    kind: Ingress
+    metadata:
+      annotations:
+        nginx.ingress.kubernetes.io/rewrite-target: /
+      creationTimestamp: "2020-10-21T21:05:32Z"
+      generation: 1
+      name: ingress
+      namespace: bookinfo
+      resourceVersion: "59227"
+      selfLink: /apis/extensions/v1beta1/namespaces/bookinfo/ingresses/ingress
+      uid: 445179eb-2420-4050-9093-9bcfc5f92947
+    spec:
+      rules:
+      - http:
+          paths:
+          - backend:
+              serviceName: mongodb
+              servicePort: 27017
+            path: /mongodb
+          - backend:
+              serviceName: mongoexpress
+              servicePort: 8081
+            path: /mongoexpress
+          - backend:
+              serviceName: details
+              servicePort: 5113
+            path: /details
+    status:
+      loadBalancer:
+        ingress:
+        - hostname: localhost
+    

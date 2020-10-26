@@ -1,0 +1,61 @@
+kind: Deployment
+apiVersion: apps/v1
+metadata:
+  name: details
+  namespace: bookinfo
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: details
+  template:
+    metadata:
+      labels:
+        app: details
+    spec:
+      containers:
+        - name: details
+          readinessProbe:
+            httpGet:
+              path: /health/ready
+              port: 5113
+              scheme: HTTP
+            initialDelaySeconds: 15
+            timeoutSeconds: 1
+            periodSeconds: 30
+            successThreshold: 1
+            failureThreshold: 3
+          terminationMessagePath: /dev/termination-log
+          livenessProbe:
+            httpGet:
+              path: /health/live
+              port: 5113
+              scheme: HTTP
+            initialDelaySeconds: 5
+            timeoutSeconds: 1
+            periodSeconds: 10
+            successThreshold: 1
+            failureThreshold: 5
+          env:
+            - name: BASE_URL
+              value: ':5113'
+            - name: STOCK_URL
+              value: 'http://stock.bookinfo.svc.cluster.local:5114'
+            - name: JAEGER_AGENT_HOST
+              value: jaeger-agent.istio-system.svc.cluster.local
+            - name: JAEGER_SERVICE_NAME
+              value: details
+            - name: JAEGER_AGENT_PORT
+              value: '6831'
+            - name: DatabaseName
+              value: detailDB
+            - name: ConnectionString
+              value: >-
+                mongodb://user:pass@mongodb/detailDB
+          ports:
+            - containerPort: 5113
+              protocol: TCP
+          imagePullPolicy: Always
+          terminationMessagePolicy: File
+          image: serdarkalayci/bookinfo-details:14
+      restartPolicy: Always

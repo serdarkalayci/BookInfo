@@ -1,0 +1,14 @@
+apiVersion: v1
+kind: Service
+metadata:
+  labels:
+    app: stock
+  name: stock
+  namespace: bookinfo
+spec:
+  ports:
+  - port: 5114
+    protocol: TCP
+    targetPort: 5114
+  selector:
+    app: stock

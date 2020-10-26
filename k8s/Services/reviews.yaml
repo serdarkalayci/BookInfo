@@ -1,0 +1,14 @@
+apiVersion: v1
+kind: Service
+metadata:
+  labels:
+    app: reviews
+  name: reviews
+  namespace: bookinfo
+spec:
+  ports:
+  - port: 5111
+    protocol: TCP
+    targetPort: 5111
+  selector:
+    app: reviews
