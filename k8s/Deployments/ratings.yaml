@@ -1,0 +1,57 @@
+kind: Deployment 
+apiVersion: apps/v1 
+metadata: 
+    name: ratings 
+    namespace: bookinfo 
+spec: 
+    replicas: 1 
+    selector: 
+        matchLabels: 
+        app: ratings 
+    template: 
+        metadata: 
+            labels: 
+                app: ratings 
+    spec: 
+        containers: 
+        - name: bookinfo-ratings
+        readinessProbe: 
+            httpGet: 
+            path: /health/ready 
+            port: 5112 
+            initialDelaySeconds: 15 
+            timeoutSeconds: 1 
+            periodSeconds: 30 
+            successThreshold: 1 
+            failureThreshold: 3 
+            terminationMessagePath: /dev/termination-log 
+        livenessProbe: 
+            httpGet: 
+            path: /health/live 
+            port: 5112 
+            scheme: HTTP 
+            initialDelaySeconds: 5 
+            timeoutSeconds: 1 
+            periodSeconds: 3 
+            successThreshold: 1 
+            failureThreshold: 3 
+        env: 
+            - name: BASE_URL 
+            value: ':5112' 
+            - name: JAEGER_AGENT_HOST 
+            value: jaeger-agent.istio-system.svc.cluster.local 
+            - name: JAEGER_SERVICE_NAME 
+            value: bookinfo-ratings 
+            - name: JAEGER_AGENT_PORT 
+            value: '6831' 
+            - name: RedisAddress 
+            value: 'redis.bookinfo.svc.cluster.local:6379' 
+            - name: DatabaseName 
+            value: '0' 
+        ports: 
+        - containerPort: 5112 
+        protocol: TCP
+        imagePullPolicy: IfNotPresent 
+        image: serdarkalayci/bookinfo-ratings:14
+        restartPolicy: Always 
+        terminationGracePeriodSeconds: 30 

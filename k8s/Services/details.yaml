@@ -1,0 +1,14 @@
+apiVersion: v1
+kind: Service
+metadata:
+  labels:
+    app: details
+  name: details
+  namespace: bookinfo
+spec:
+  ports:
+  - port: 5113
+    protocol: TCP
+    targetPort: 5113
+  selector:
+    app: details
