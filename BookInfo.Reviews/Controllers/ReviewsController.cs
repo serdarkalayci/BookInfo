@@ -51,7 +51,6 @@ namespace BookInfo.Reviews.Controllers
                 var reviews = _reviewContext.Reviews.Where(x => x.BookId == bookId);
                 var reviewsDto = reviews.Map<Models.Review, Dto.Review>();
                 result.Reviews = reviewsDto.ToArray();
-                _logger.LogInformation($"Review fetched successfully for BookId:{bookId}");
                 return Ok(result);
             }
             catch (Exception ex)
@@ -75,7 +74,6 @@ namespace BookInfo.Reviews.Controllers
                 serviceURL += "/ratings/" + bookId;
                 var streamTask = client.GetStreamAsync(serviceURL);
                 var result = await JsonSerializer.DeserializeAsync<Dto.ReviewResult>(await streamTask);
-                _logger.LogInformation($"Ratings fetched successfully for BookId:{bookId}");
                 return result;
             }
             catch (Exception ex)
