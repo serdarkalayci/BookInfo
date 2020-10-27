@@ -1,6 +1,7 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using BookInfo.Stock.RedisDatabase;
+using System;
 
 namespace BookInfo.Stock.Controllers
 {
@@ -28,13 +29,23 @@ namespace BookInfo.Stock.Controllers
         [Route("{bookId:int}")]
         public IActionResult GetSingle(int bookId)
         {
+            _logger.LogInformation($"Fetching stocks for BookId:{bookId}");
             Data.BookStocks stockData = new Data.BookStocks();
-            int currentStock = stockData.GetStock(_redisDatabaseProvider, bookId);
-
-            var result = new Dto.Stock() {
-                CurrentStock = currentStock
-            };
-            return Ok(result);
+            try
+            {
+                int currentStock = stockData.GetStock(_redisDatabaseProvider, bookId);
+                var result = new Dto.Stock()
+                {
+                    CurrentStock = currentStock
+                };
+                _logger.LogInformation($"Success fetching stocks for BookId:{bookId}");
+                return Ok(result);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, $"Can not retrieve stocks for BookId:{bookId}");
+                return NoContent();
+            }
         }
     }
 }
